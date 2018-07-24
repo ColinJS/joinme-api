@@ -1,0 +1,1 @@
+web: gunicorn joinMeApi.wsgi --log-file -
