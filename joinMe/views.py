@@ -149,7 +149,7 @@ class FriendList(APIView):
             create_friendship = Friendship.objects.distinct().filter(creator__pk=user.pk)
             friend_friendship = Friendship.objects.distinct().filter(friend__pk=user.pk)
 
-            ctx = {'friends': []}.
+            ctx = {'friends': []}
             for friend in create_friendship:
                 new_friend = {
                     'id': friend.friend.pk,
