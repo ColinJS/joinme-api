@@ -35,7 +35,9 @@ class FirstConnection(APIView):
                 response = requests.get(
                     'https://graph.facebook.com/me/picture',
                     params={'access_token': user.social_auth.get(provider="facebook").extra_data['access_token'],
-                            'redirect': False}
+                            'redirect': False,
+                            'type': 'large',
+                            }
                 )
                 if response.status_code == 200:
                     # return Response(user.avatars.all()[0].url)
