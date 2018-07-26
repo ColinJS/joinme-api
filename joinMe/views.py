@@ -161,7 +161,7 @@ class FriendList(APIView):
 
             for friend in friend_friendship:
                 id = friend.creator.pk
-                if ([c for c in ctx if id == c['id']] == 0):
+                if len([c for c in ctx['friends'] if id == c['id']]) == 0:
                     new_friend = {
                         'id': friend.creator.pk,
                         'first_name': friend.creator.first_name,
