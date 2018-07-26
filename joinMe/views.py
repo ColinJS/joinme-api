@@ -160,13 +160,15 @@ class FriendList(APIView):
                 ctx['friends'].append(new_friend)
 
             for friend in friend_friendship:
-                new_friend = {
-                    'id': friend.friend.pk,
-                    'first_name': friend.friend.first_name,
-                    'last_name': friend.friend.last_name,
-                    'avatar': friend.friend.avatars.last().url if friend.friend.avatars and friend.friend.avatars.last() else '',
-                }
-                ctx['friends'].append(new_friend)
+                id = friend.creator.pk
+                if ([c for c in ctx if id == c['id']] == 0):
+                    new_friend = {
+                        'id': friend.creator.pk,
+                        'first_name': friend.creator.first_name,
+                        'last_name': friend.creator.last_name,
+                        'avatar': friend.creator.avatars.last().url if friend.creator.avatars and friend.creator.avatars.last() else '',
+                    }
+                    ctx['friends'].append(new_friend)
 
             return Response(ctx)
 
