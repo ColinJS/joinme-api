@@ -55,7 +55,7 @@ class FirstConnection(APIView):
                 if response.status_code == 200:
                     friends = []
                     for friend in response.json()["data"]:
-                        friends = User.objects.filter(social_auth__uid=friend['id'])
+                        friends.append(User.objects.get(social_auth__uid=friend['id']))
 
                     for friend in friends:
                         friendship = Friendship(creator=user, friend=friend, state=1)
