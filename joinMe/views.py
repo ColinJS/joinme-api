@@ -28,7 +28,7 @@ class FirstConnection(APIView):
         if request.auth:
             user = request.user
 
-            if len(Profile.objects.filter(user__pk=user.pk)) or not user.profile.init:
+            if len(Profile.objects.filter(user__pk=user.pk)) == 0 or not user.profile.init:
 
                 # Get the avatar url of the user and store it
                 # TODO: Check if the avatar already exist
