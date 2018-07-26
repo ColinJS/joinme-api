@@ -155,7 +155,7 @@ class FriendList(APIView):
                     'id': friend.friend.pk,
                     'first_name': friend.friend.first_name,
                     'last_name': friend.friend.last_name,
-                    'avatar': friend.friend.avatars.last().url,
+                    #'avatar': friend.friend.avatars.last().url,
                 }
                 ctx['friends'].append(new_friend)
 
@@ -164,7 +164,7 @@ class FriendList(APIView):
                     'id': friend.friend.pk,
                     'first_name': friend.friend.first_name,
                     'last_name': friend.friend.last_name,
-                    'avatar': friend.friend.avatars.last().url,
+                    #'avatar': friend.friend.avatars.last().url,
                 }
                 ctx['friends'].append(new_friend)
 
