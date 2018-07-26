@@ -62,6 +62,15 @@ class FirstConnection(APIView):
                 profile = Profile(user=request.user, init=True)
                 profile.save()
 
+            ctx = {
+                'id': user.id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'avatar': user.avatars.last().url,
+            }
+
+            return Response(ctx)
+
 
         return Response({'init': True})
 
