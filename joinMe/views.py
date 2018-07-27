@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404
 
 import os
 import requests
+import subprocess
 
 from joinMe.models import Friendship, Profile, Avatar, Event, Video
 from joinMe.serializers import FriendshipSerializer, UserSerializer, AvatarSerializer, EventSerializer, VideoSerializer
@@ -81,6 +82,7 @@ class EventList(APIView):
 
     def post(self, request):
         # TODO: convert mov file to mp4
+        print(request.FILES['video'])
         if request.auth:
             user = request.user
 
