@@ -86,7 +86,7 @@ class EventList(APIView):
             user = request.user
 
             with transaction.atomic():
-                video = Video(video=request.FILES['video'].split('.')[-1]+".mp4")
+                video = Video(video=request.FILES['video'])
                 video.save()
 
                 event = Event(created_by=user)
