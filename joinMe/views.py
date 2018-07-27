@@ -85,9 +85,10 @@ class EventList(APIView):
         print(request.FILES['video'])
         if request.auth:
             user = request.user
+            subprocess.call('../../vendor/ffmpeg/bin/ffmpeg -i {} {}'.format(request.FILES['video'], request.FILES['video'].split('.')[-1]+".mp4"))
 
             with transaction.atomic():
-                video = Video(video=request.FILES['video'])
+                video = Video(video=request.FILES['video'].split('.')[-1]+".mp4")
                 video.save()
 
                 event = Event(created_by=user)
