@@ -172,7 +172,7 @@ class FriendList(APIView):
 
             return Response(ctx)
 
-class ShareingEvent(APIView):
+class SharingEvent(APIView):
 
     def put(self, request, event_id):
 
@@ -183,10 +183,12 @@ class ShareingEvent(APIView):
 
             if event.created_by == user or event.guests.filter(pk=user.pk):
 
-                friend_id = request.data['friend_id']
-                friend = get_object_or_404(User, pk=friend_id)
-                print([friend.__dict__[x] for x in friend.__dict__.keys() if not x.startswith('_')])
-                event.guests.add(friend)
+                friends = []
+                for f in request.data['friend']:
+                    f_user = User.objects.filter(pk=f['id']).first()
+                    if f_user:
+                        event.guests.add(f_user)
+                        
                 event.save()
 
             ctx = {'response': []}
