@@ -93,7 +93,7 @@ class EventList(APIView):
                 event.videos.set([video])
                 event.save()
 
-                return Response(request.build_absolute_uri(user.my_events.last().videos.last().video.url))
+                return Response({'id': event.id, 'uri': request.build_absolute_uri(user.my_events.last().videos.last().video.url)})
 
     def get(self, request):
 
@@ -188,7 +188,7 @@ class SharingEvent(APIView):
                     f_user = User.objects.filter(pk=f['id']).first()
                     if f_user:
                         event.guests.add(f_user)
-                        
+
                 event.save()
 
             ctx = {'response': []}
