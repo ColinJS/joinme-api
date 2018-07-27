@@ -93,10 +93,13 @@ class EventList(APIView):
                 event.videos.set([video])
                 event.save()
 
-                print(event.id)
-                print(event.videos.last().video.url)
 
-            return Response({'id': user.my_events.last().id, 'uri': request.build_absolute_uri(user.my_events.last().videos.last().video.url)})
+            ctx = {
+                'id': user.my_events.last().id,
+                'uri': request.build_absolute_uri(user.my_events.last().videos.last().video.url)
+            }
+            print(ctx)
+            return Response(ctx)
 
         return Response({'error': 'Not added ...'})
 
