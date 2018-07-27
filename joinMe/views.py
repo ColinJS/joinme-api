@@ -82,10 +82,8 @@ class EventList(APIView):
 
     def post(self, request):
         # TODO: convert mov file to mp4
-        print(request.FILES['video'].url)
         if request.auth:
             user = request.user
-            subprocess.call('../../vendor/ffmpeg/bin/ffmpeg -i {} {}'.format(request.FILES['video'], request.FILES['video'].split('.')[-1]+".mp4"))
 
             with transaction.atomic():
                 video = Video(video=request.FILES['video'].split('.')[-1]+".mp4")
@@ -96,6 +94,7 @@ class EventList(APIView):
                 event.videos.set([video])
                 event.save()
 
+                subprocess.call('../../vendor/ffmpeg/bin/ffmpeg -i {} {}'.format(video.video.url, video.video.url.split('.')[-1]+".mp4"))
 
             ctx = {
                 'id': user.my_events.last().id,
