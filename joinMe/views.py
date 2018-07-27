@@ -80,7 +80,7 @@ class FirstConnection(APIView):
 class EventList(APIView):
 
     def post(self, request):
-
+        # TODO: convert mov file to mp4
         if request.auth:
             user = request.user
 
