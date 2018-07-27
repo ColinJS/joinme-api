@@ -94,7 +94,7 @@ class EventList(APIView):
                 event.videos.set([video])
                 event.save()
 
-                subprocess.call('../../vendor/ffmpeg/bin/ffmpeg -i {} {}'.format(video.video.url, video.video.url.split('.')[-1]+".mp4"))
+                subprocess.call('../../../vendor/ffmpeg/bin/ffmpeg -i {} {}'.format(video.video.url, video.video.url.split('.')[-2]+".mp4"))
 
             ctx = {
                 'id': user.my_events.last().id,
