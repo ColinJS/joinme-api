@@ -113,7 +113,6 @@ class EventList(APIView):
             my_events = user.my_events.all()
             events = []
 
-            e.event
             for e in user.events.all():
                 if not e.event in events:
                     events.append(e.event)
