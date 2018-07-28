@@ -16,7 +16,6 @@ class Avatar(models.Model):
 class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='my_events', on_delete=models.DO_NOTHING, blank=True)
-    guests = models.ManyToManyField(User, related_name='events', blank=True)
 
 
 class Video(models.Model):
@@ -30,3 +29,10 @@ class Friendship(models.Model):
     creator = models.ForeignKey(User, related_name='friendship_creator', on_delete=models.CASCADE, blank=False)
     friend = models.ForeignKey(User, related_name='friendship_friend', on_delete=models.CASCADE, blank=False)
     state = models.SmallIntegerField(choices=((0, "PENDING"), (1, "ACCEPTED"), (2, "BLOCKED")), default="PENDING")
+
+
+class GuestToEvent(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    guest = models.ForeignKey(User, related_name='events', blank=True, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, related_name='guests', blank=True, on_delete=models.CASCADE)
+    state = models.SmallIntegerField(choices=((0, "PENDING"), (1, "ACCEPTED"), (2, "REFUSED")), default="PENDING")

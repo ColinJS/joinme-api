@@ -17,7 +17,7 @@ import os
 import requests
 import subprocess
 
-from joinMe.models import Friendship, Profile, Avatar, Event, Video
+from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent
 from joinMe.serializers import FriendshipSerializer, UserSerializer, AvatarSerializer, EventSerializer, VideoSerializer
 
 
@@ -156,8 +156,8 @@ class FriendList(APIView):
         if request.auth:
             user = request.user
 
-            create_friendship = Friendship.objects.distinct().filter(creator__pk=user.pk)
-            friend_friendship = Friendship.objects.distinct().filter(friend__pk=user.pk)
+            create_friendship = Friendship.objects.distinct().filter(creator__pk=user.pk).filter(state=1)
+            friend_friendship = Friendship.objects.distinct().filter(friend__pk=user.pk).filter(state=1)
 
             ctx = {'friends': []}
             for friend in create_friendship:
@@ -191,18 +191,18 @@ class SharingEvent(APIView):
 
             event = get_object_or_404(Event, pk=event_id)
 
-            if event.created_by == user or event.guests.filter(pk=user.pk):
+            if event.created_by == user or event.guests.guest.filter(pk=user.pk):
 
                 friends = []
                 for f in request.data['friends']:
                     f_user = User.objects.filter(pk=f['id']).first()
                     if f_user:
-                        event.guests.add(f_user)
+                        sharing = GuestToEvent(guest=f_user, event=event, state='PENDING')
 
-                event.save()
+                sharing.save()
 
             ctx = {'response': []}
-            guests = event.guests.all()
+            guests = event.guests.guest.all()
 
             for guest in guests:
                 new_guest = {
