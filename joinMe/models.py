@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import datetime
+from django.utils import timezone
 
 class Profile(models.Model):
     init = models.BooleanField(default= False)
@@ -17,7 +18,7 @@ class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='my_events', on_delete=models.DO_NOTHING, blank=True)
     duration = models.DurationField(blank=True, default=datetime.timedelta(hours=3))
-    ending_time = models.DateTimeField(default=datetime.datetime.now()+datetime.timedelta(hours=3))
+    ending_time = models.DateTimeField(default=timezone.now()+datetime.timedelta(hours=3))
 
 
 
