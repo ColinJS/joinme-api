@@ -202,7 +202,7 @@ class SharingEvent(APIView):
                 sharing.save()
 
             ctx = {'response': []}
-            guests = event.guests.guest.all()
+            guests = [gte.guest for gte in GuestToEvent.objects.filter(event__pk=event.pk)]
 
             for guest in guests:
                 new_guest = {
