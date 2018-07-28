@@ -197,7 +197,7 @@ class SharingEvent(APIView):
                 for f in request.data['friends']:
                     f_user = User.objects.filter(pk=f['id']).first()
                     if f_user:
-                        sharing = GuestToEvent(guest=f_user, event=event, state='PENDING')
+                        sharing = GuestToEvent(guest=f_user, event=event, state=0)
 
                 sharing.save()
 
