@@ -111,7 +111,11 @@ class EventList(APIView):
             user = request.user
 
             my_events = user.my_events.all()
-            events = user.events.all()
+            events = []
+
+            e.event
+            for e in user.events.all():
+                if e.event.pk 
 
             ctx = {'my_events': [], 'events': []}
 
