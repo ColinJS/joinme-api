@@ -16,6 +16,9 @@ class Avatar(models.Model):
 class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='my_events', on_delete=models.DO_NOTHING, blank=True)
+    duration = models.DurationField()
+    ending_time = models.DateTimeField()
+
 
 
 class Video(models.Model):
@@ -36,3 +39,9 @@ class GuestToEvent(models.Model):
     guest = models.ForeignKey(User, related_name='events', blank=True, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='guests', blank=True, on_delete=models.CASCADE)
     state = models.SmallIntegerField(choices=((0, "PENDING"), (1, "ACCEPTED"), (2, "REFUSED")), default="PENDING")
+
+
+class Place(models.Model):
+    formatted_address = models.CharField(max_length=200, blank=False)
+    place_id = models.CharField(max_length=200, blank=False)
+    event = models.ForeignKey(Event, related_name='place', on_delete=models.CASCADE)

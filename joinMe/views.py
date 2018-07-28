@@ -12,6 +12,7 @@ from rest_framework import renderers
 from rest_framework import generics
 from django.db import transaction, IntegrityError
 from django.shortcuts import get_object_or_404
+import datetime
 
 import os
 import requests
@@ -89,18 +90,17 @@ class EventList(APIView):
                 video = Video(video=request.FILES['video'])
                 video.save()
 
-                event = Event(created_by=user)
+                duration = datetime.timedelta(hours=3)
+                event = Event(created_by=user, duration=duration, ending_time=datetime.datetime.now()+duration)
                 event.save()
                 event.videos.set([video])
                 event.save()
-
-                subprocess.call('vendor/ffmpeg/bin/ffmpeg -i {} {}'.format(video.video.url, video.video.url.split('.')[-2]+".mp4"), shell=True)
 
             ctx = {
                 'id': user.my_events.last().id,
                 'uri': request.build_absolute_uri(user.my_events.last().videos.last().video.url)
             }
-            print(ctx)
+
             return Response(ctx)
 
         return Response({'error': 'Not added ...'})
@@ -110,10 +110,10 @@ class EventList(APIView):
         if request.auth:
             user = request.user
 
-            my_events = user.my_events.all()
+            my_events = user.my_events.filter(ending_date__lte=datetime.datetime.now())
             events = []
 
-            for e in user.events.all():
+            for e in user.events.filter(ending_date__lte=datetime.datetime.now()):
                 if e.event not in events:
                     events.append(e.event)
 
