@@ -114,7 +114,7 @@ class EventList(APIView):
             events = []
 
             for e in user.events.all():
-                if not e.event in events:
+                if e.event not in events:
                     events.append(e.event)
 
             ctx = {'my_events': [], 'events': []}
