@@ -17,7 +17,7 @@ class Event(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='my_events', on_delete=models.DO_NOTHING, blank=True)
     duration = models.DurationField(blank=True, default=datetime.timedelta(hours=3))
-    ending_time = models.DateTimeField(auto_now_add=True)
+    ending_time = models.DateTimeField(default=datetime.datetime.now()+datetime.timedelta(hours=3))
 
 
 
