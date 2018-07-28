@@ -92,7 +92,7 @@ class EventList(APIView):
                 video.save()
 
                 duration = datetime.timedelta(hours=3)
-                event = Event(created_by=user, duration=duration, ending_time=datetime.datetime.now()+duration)
+                event = Event(created_by=user, duration=duration, ending_time=timezone.now()+duration)
                 event.save()
                 event.videos.set([video])
                 event.save()
