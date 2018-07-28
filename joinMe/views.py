@@ -13,6 +13,7 @@ from rest_framework import generics
 from django.db import transaction, IntegrityError
 from django.shortcuts import get_object_or_404
 import datetime
+from django.utils import timezone
 
 import os
 import requests
@@ -109,13 +110,13 @@ class EventList(APIView):
 
         if request.auth:
             user = request.user
-            now = datetime.datetime.now()
+            now = timezone.now()
 
             my_events = user.my_events.filter(ending_time__lte=now)
             events = []
 
             for e in user.events.filter(state=0):
-                if e.event not in events and e.event.ending_time <= datetime.datetime.now():
+                if e.event not in events and e.event.ending_time <= now:
                     events.append(e.event)
 
             ctx = {'my_events': [], 'events': []}
