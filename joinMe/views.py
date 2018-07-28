@@ -113,9 +113,9 @@ class EventList(APIView):
             my_events = user.my_events.filter(ending_time__lte=datetime.datetime.now())
             events = []
 
-            for e in user.events.filter(ending_time__lte=datetime.datetime.now()):
-                if e.event not in events:
-                    events.append(e.event)
+            for e in user.events.event.filter(ending_time__lte=datetime.datetime.now()):
+                if e not in events:
+                    events.append(e)
 
             ctx = {'my_events': [], 'events': []}
 
