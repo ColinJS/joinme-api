@@ -110,10 +110,10 @@ class EventList(APIView):
         if request.auth:
             user = request.user
 
-            my_events = user.my_events.filter(ending_date__lte=datetime.datetime.now())
+            my_events = user.my_events.filter(ending_time__lte=datetime.datetime.now())
             events = []
 
-            for e in user.events.filter(ending_date__lte=datetime.datetime.now()):
+            for e in user.events.filter(ending_time__lte=datetime.datetime.now()):
                 if e.event not in events:
                     events.append(e.event)
 
