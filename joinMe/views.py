@@ -112,11 +112,11 @@ class EventList(APIView):
             user = request.user
             now = timezone.now()
 
-            my_events = user.my_events.filter(ending_time__lte=now)
+            my_events = user.my_events.filter(ending_time__gte=now)
             events = []
 
             for e in user.events.filter(state=0):
-                if e.event not in events and e.event.ending_time <= now:
+                if e.event not in events and e.event.ending_time >= now:
                     events.append(e.event)
 
             ctx = {'my_events': [], 'events': []}
