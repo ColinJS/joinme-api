@@ -93,16 +93,16 @@ class EventList(APIView):
             friends = []
             duration = datetime.timedelta(hours=3)
 
-            if data['place'][0]:
-                tmp_place = json.load(data['place'][0])
+            if data['place']:
+                tmp_place = json.load(data['place'])
                 place['formatted_address'] = tmp_place['formatted_address']
                 place['place_id'] = tmp_place['place_id']
 
-            if data['friends'][0]:
-                friends = json.load(data['friends'][0])
+            if data['friends']:
+                friends = json.load(data['friends'])
 
-            if data['duration'][0]:
-                tmp_time = json.load(data['duration'][0])
+            if data['duration']:
+                tmp_time = json.load(data['duration'])
                 duration = datetime.timedelta(hours=tmp_time['hours'], minutes=tmp_time['moinutes'])
 
             with transaction.atomic():
