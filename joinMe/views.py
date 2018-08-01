@@ -17,6 +17,7 @@ from django.utils import timezone
 
 import os
 import requests
+import json
 import subprocess
 
 from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place
@@ -92,15 +93,17 @@ class EventList(APIView):
             friends = []
             duration = datetime.timedelta(hours=3)
 
-            if data['place']:
-                place['formatted_address'] = data['place']['formatted_address']
-                place['place_id'] = data['place']['place_id']
+            if data['place'][0]:
+                tmp_place = json.load(data['place'][0])
+                place['formatted_address'] = tmp_place['formatted_address']
+                place['place_id'] = tmp_place['place_id']
 
-            if data['friends']:
-                friends = friends['friends']
+            if data['friends'][0]:
+                friends = json.load(data['friends'][0])
 
-            if data['duration']:
-                duration = datetime.timedelta(hours=data['duration']['hours'], minutes=data['duration']['moinutes'])
+            if data['duration'][0]:
+                tmp_time = json.load(data['duration'][0])
+                duration = datetime.timedelta(hours=tmp_time['hours'], minutes=tmp_time['moinutes'])
 
             with transaction.atomic():
                 video = Video(video=request.FILES['video'])
