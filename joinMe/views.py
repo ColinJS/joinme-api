@@ -95,7 +95,7 @@ class EventList(APIView):
                 place['formatted_address'] = data['place_fn']
                 place['place_id'] = data['place_id']
 
-            if data['duration_h'] and data['duration_m']:
+            if 'duration_h' in data and 'duration_m' in data:
                 duration = datetime.timedelta(hours=int(data['duration_h']), minutes=int(data['duration_m']))
 
             with transaction.atomic():
