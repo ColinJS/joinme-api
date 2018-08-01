@@ -19,7 +19,7 @@ import os
 import requests
 import subprocess
 
-from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent
+from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place
 from joinMe.serializers import FriendshipSerializer, UserSerializer, AvatarSerializer, EventSerializer, VideoSerializer
 
 
@@ -86,16 +86,41 @@ class EventList(APIView):
         # TODO: convert mov file to mp4
         if request.auth:
             user = request.user
+            data = request.data
+            place = {'formatted_address': '', 'place_id': ''}
+            friends = []
+            duration = datetime.timedelta(hours=3)
+
+            if data['place']:
+                place['formatted_address'] = data['place']['formatted_address']
+                place['place_id'] = data['place']['place_id']
+
+            if data['friends']:
+                friends = friends['friends']
+
+            if data['duration']:
+                duration = datetime.timedelta(hours=data['duration']['hours'], minutes=data['duration']['moinutes'])
 
             with transaction.atomic():
                 video = Video(video=request.FILES['video'])
                 video.save()
 
-                duration = datetime.timedelta(hours=3)
+
                 event = Event(created_by=user, duration=duration, ending_time=timezone.now()+duration)
                 event.save()
                 event.videos.set([video])
                 event.save()
+
+                place = Place(formatted_address=place['formatted_address'], place_id=place['place_id'], event=event)
+                place.save()
+
+                if len(friends) > 0:
+                    for f in friends:
+                        f_user = User.objects.filter(pk=f['id']).first()
+                        if f_user:
+                            sharing = GuestToEvent(guest=f_user, event=event, state=0)
+                            sharing.save()
+
 
             ctx = {
                 'id': user.my_events.last().id,
@@ -204,8 +229,7 @@ class SharingEvent(APIView):
                     f_user = User.objects.filter(pk=f['id']).first()
                     if f_user:
                         sharing = GuestToEvent(guest=f_user, event=event, state=0)
-
-                sharing.save()
+                        sharing.save()
 
             ctx = {'response': []}
             guests = [gte.guest for gte in GuestToEvent.objects.filter(event__pk=event.pk)]
