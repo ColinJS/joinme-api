@@ -98,7 +98,7 @@ class EventList(APIView):
             if 'duration_h' in data and 'duration_m' in data:
                 duration = datetime.timedelta(hours=int(data['duration_h']), minutes=int(data['duration_m']))
 
-            if 'video' in request.Files:
+            if request.FILES and 'video' in request.FILES:
                 with transaction.atomic():
                     video = Video(video=request.FILES['video'])
                     video.save()
