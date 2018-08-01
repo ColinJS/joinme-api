@@ -87,6 +87,7 @@ class EventList(APIView):
         if request.auth:
             user = request.user
             data = request.data
+            print(data)
             place = {'formatted_address': '', 'place_id': ''}
             friends = []
             duration = datetime.timedelta(hours=3)
