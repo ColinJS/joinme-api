@@ -96,7 +96,7 @@ class EventList(APIView):
                 place['place_id'] = data['place_id']
 
             if data['duration_h'] and data['duration_m']:
-                duration = datetime.timedelta(hours=data['duration_h'], minutes=data['duration_m'])
+                duration = datetime.timedelta(hours=int(data['duration_h']), minutes=int(data['duration_m']))
 
             with transaction.atomic():
                 video = Video(video=request.FILES['video'])
