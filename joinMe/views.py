@@ -91,7 +91,7 @@ class EventList(APIView):
             place = {'formatted_address': '', 'place_id': ''}
             duration = datetime.timedelta(hours=3)
 
-            if data['place_fn'] and data['place_id']:
+            if 'place_fn' in data and 'place_id' in data:
                 place['formatted_address'] = data['place_fn']
                 place['place_id'] = data['place_id']
 
