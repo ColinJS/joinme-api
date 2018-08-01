@@ -98,18 +98,19 @@ class EventList(APIView):
             if 'duration_h' in data and 'duration_m' in data:
                 duration = datetime.timedelta(hours=int(data['duration_h']), minutes=int(data['duration_m']))
 
-            with transaction.atomic():
-                video = Video(video=request.FILES['video'])
-                video.save()
+            if 'video' in request.Files:
+                with transaction.atomic():
+                    video = Video(video=request.FILES['video'])
+                    video.save()
 
 
-                event = Event(created_by=user, duration=duration, ending_time=timezone.now()+duration)
-                event.save()
-                event.videos.set([video])
-                event.save()
+                    event = Event(created_by=user, duration=duration, ending_time=timezone.now()+duration)
+                    event.save()
+                    event.videos.set([video])
+                    event.save()
 
-                place = Place(formatted_address=place['formatted_address'], place_id=place['place_id'], event=event)
-                place.save()
+                    place = Place(formatted_address=place['formatted_address'], place_id=place['place_id'], event=event)
+                    place.save()
 
             ctx = {
                 'id': user.my_events.last().id,
