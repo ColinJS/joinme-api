@@ -88,22 +88,15 @@ class EventList(APIView):
         if request.auth:
             user = request.user
             data = request.data
-            print(data)
             place = {'formatted_address': '', 'place_id': ''}
-            friends = []
             duration = datetime.timedelta(hours=3)
 
-            if data['place'][0]:
-                tmp_place = json.loads(data['place'][0])
-                place['formatted_address'] = tmp_place['formatted_address']
-                place['place_id'] = tmp_place['place_id']
+            if data['place']:
+                place['formatted_address'] = data['place'][0]
+                place['place_id'] = data['place'][1]
 
-            if data['friends'][0]:
-                friends = json.loads(data['friends'][0])
-
-            if data['duration'][0]:
-                tmp_time = json.loads(data['duration'][0])
-                duration = datetime.timedelta(hours=tmp_time['hours'], minutes=tmp_time['moinutes'])
+            if data['duration']:
+                duration = datetime.timedelta(hours=data['duration'][0], minutes=data['duration'][1])
 
             with transaction.atomic():
                 video = Video(video=request.FILES['video'])
@@ -117,14 +110,6 @@ class EventList(APIView):
 
                 place = Place(formatted_address=place['formatted_address'], place_id=place['place_id'], event=event)
                 place.save()
-
-                if len(friends) > 0:
-                    for f in friends:
-                        f_user = User.objects.filter(pk=f['id']).first()
-                        if f_user:
-                            sharing = GuestToEvent(guest=f_user, event=event, state=0)
-                            sharing.save()
-
 
             ctx = {
                 'id': user.my_events.last().id,
