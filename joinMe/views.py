@@ -91,12 +91,12 @@ class EventList(APIView):
             place = {'formatted_address': '', 'place_id': ''}
             duration = datetime.timedelta(hours=3)
 
-            if data['place']:
-                place['formatted_address'] = data['place'][0]
-                place['place_id'] = data['place'][1]
+            if data['place_fn'] and data['place_id']:
+                place['formatted_address'] = data['place_fn']
+                place['place_id'] = data['place_id']
 
-            if data['duration']:
-                duration = datetime.timedelta(hours=data['duration'][0], minutes=data['duration'][1])
+            if data['duration_h'] and data['duration_m']:
+                duration = datetime.timedelta(hours=data['duration_h'], minutes=data['duration_m'])
 
             with transaction.atomic():
                 video = Video(video=request.FILES['video'])
