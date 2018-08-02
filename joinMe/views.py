@@ -185,6 +185,21 @@ class eventDetails(APIView):
             }
             return Response(ctx)
 
+    def put(self, request, event_id):
+        if request.auth:
+            user = request.user
+            data = request.data
+
+            if 'coming' in data:
+                guestToEvent = GuestToEvent.objects.filter(event__pk=event_id, guest__pk=user.pk)
+                for g in guestToEvent:
+                    g.state = data['coming']
+                    g.save()
+                return Response({'message': 'Update your state to the event is done'})
+
+            return Response({'message': 'Can\'t find coming variable'})
+
+
 
 
 class FriendList(APIView):
