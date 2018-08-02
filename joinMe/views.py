@@ -179,7 +179,7 @@ class eventDetails(APIView):
                 'id': event.pk,
                 'place': {
                     'formatted_address': event.place.last().formatted_address,
-                    'place_id': event.place.place_id,
+                    'place_id': event.place.last().place_id,
                 },
                 'duration': event.ending_time
             }
