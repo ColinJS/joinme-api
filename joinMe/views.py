@@ -123,7 +123,7 @@ class EventList(APIView):
         return Response({'error': 'Not added ...'})
 
     def get(self, request):
-
+        # TODO: my_events must not be used for fetching event of the user, only to now who's the creator of an event
         if request.auth:
             user = request.user
             now = timezone.now()
@@ -131,7 +131,7 @@ class EventList(APIView):
             my_events = user.my_events.filter(ending_time__gte=now)
             events = []
 
-            for e in user.events.filter(state=0):
+            for e in user.events.all():
                 if e.event not in events and e.event.ending_time >= now:
                     events.append(e.event)
 
@@ -166,7 +166,7 @@ class EventList(APIView):
             return Response(ctx)
 
 
-class eventDetails(APIView):
+class EventDetails(APIView):
     # TODO: return the event info
     def get(self, request, event_id):
         if request.auth:
