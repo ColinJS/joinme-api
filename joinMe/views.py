@@ -181,7 +181,7 @@ class eventDetails(APIView):
                     'formatted_address': event.place.last().formatted_address,
                     'place_id': event.place.last().place_id,
                 },
-                'duration': event.ending_time
+                'ending_date': event.ending_time
             }
             return Response(ctx)
 
