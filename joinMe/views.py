@@ -166,10 +166,25 @@ class EventList(APIView):
             return Response(ctx)
 
 
-@csrf_exempt
-def getEventDetails(request):
+class eventDetails(APIView):
     # TODO: return the event info
-    pass
+    def get(self, request, event_id):
+        if request.auth:
+            user = request.user
+
+            event = get_object_or_404(Event, pk=event_id)
+            ctx = {
+                'video_url': request.build_absolute_uri(event.videos.last().video.url),
+                'creation_date': event.created,
+                'id': event.pk,
+                'place': {
+                    'formatted_address': event.place.formatted_address,
+                    'place_id': event.place.place_id,
+                },
+                'duration': event.ending_time
+            }
+            return Response(ctx)
+
 
 
 class FriendList(APIView):
