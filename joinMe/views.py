@@ -178,7 +178,7 @@ class eventDetails(APIView):
                 'creation_date': event.created,
                 'id': event.pk,
                 'place': {
-                    'formatted_address': event.place.formatted_address,
+                    'formatted_address': event.place.last().formatted_address,
                     'place_id': event.place.place_id,
                 },
                 'duration': event.ending_time
