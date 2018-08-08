@@ -193,6 +193,7 @@ class EventDetails(APIView):
                     'last_name': guest.guest.last_name,
                     'state': guest.state,
                     'avatar': guest.guest.avatars.last().url,
+                    'id': guest.guest.pk,
                 }
                 if new_guest not in ctx['guests']:
                     ctx['guests'].append(new_guest)
