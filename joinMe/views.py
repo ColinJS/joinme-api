@@ -77,7 +77,6 @@ class FirstConnection(APIView):
 
             return Response(ctx)
 
-
         return Response({'init': True})
 
 
@@ -165,6 +164,8 @@ class EventList(APIView):
 
             return Response(ctx)
 
+        return Response({'response': request.auth})
+
 
 class EventDetails(APIView):
     # TODO: return the event info
@@ -173,6 +174,7 @@ class EventDetails(APIView):
             user = request.user
 
             event = get_object_or_404(Event, pk=event_id)
+            guests = event.guests.all()
             ctx = {
                 'video_url': request.build_absolute_uri(event.videos.last().video.url),
                 'creation_date': event.created,
@@ -181,9 +183,23 @@ class EventDetails(APIView):
                     'formatted_address': event.place.last().formatted_address,
                     'place_id': event.place.last().place_id,
                 },
-                'ending_date': event.ending_time
+                'ending_date': event.ending_time,
+                'guests': [],
             }
+
+            for guest in guests:
+                new_guest = {
+                    'first_name': guest.guest.first_name,
+                    'last_name': guest.guest.last_name,
+                    'state': guest.state,
+                    'avatar': guest.guest.avatars.last().url,
+                }
+                if new_guest not in ctx['guests']:
+                    ctx['guests'].append(new_guest)
+
             return Response(ctx)
+
+        return Response({'response': request.auth})
 
     def put(self, request, event_id):
         if request.auth:
@@ -198,6 +214,8 @@ class EventDetails(APIView):
                 return Response({'message': 'Update your state to the event is done'})
 
             return Response({'message': 'Can\'t find coming variable'})
+
+        return Response({'response': request.auth})
 
 
 
@@ -233,6 +251,8 @@ class FriendList(APIView):
                     ctx['friends'].append(new_friend)
 
             return Response(ctx)
+
+        return Response({'response': request.auth})
 
 class SharingEvent(APIView):
 
