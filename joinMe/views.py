@@ -15,7 +15,6 @@ from django.shortcuts import get_object_or_404
 import datetime
 from django.utils import timezone
 
-import os
 import requests, os, boto3
 import json
 import subprocess
