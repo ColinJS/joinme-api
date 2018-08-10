@@ -290,9 +290,9 @@ class aws_s3_interface(APIView):
 
     def get(self, request):
         S3_BUCKET = os.environ.get('S3_BUCKET')
-        print(request.data)
-        filename = request.data['filename']
-        filetype = request.data['filetype']
+
+        filename = request.GET.get('filename', '')
+        filetype = request.GET.get('filetype', '')
 
         s3 = boto3.client('s3')
 
