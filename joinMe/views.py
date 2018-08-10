@@ -16,7 +16,7 @@ import datetime
 from django.utils import timezone
 
 import os
-import requests
+import requests, os, boto3
 import json
 import subprocess
 
@@ -285,3 +285,30 @@ class SharingEvent(APIView):
             return Response(ctx)
 
         return Response({'response': request.auth})
+
+
+class aws_s3_interface(APIView):
+
+    def get(self, request):
+        S3_BUCKET = os.environ.get('S3_BUCKET')
+
+        filename = request.data['filename']
+        filetype = request.data['filetype']
+
+        s3 = boto3.client('s3')
+
+        presigned_post = s3.generate_presigned_post(
+            Bucket=S3_BUCKET,
+            Key=filename,
+            Fields={"acl": "public-read", "Content-Type": filetype},
+            Conditions=[
+                {"acl": "public-read"},
+                {"Content-Type": filetype}
+            ],
+            ExpiresIn=3600
+        )
+
+        return Response({
+            'data': presigned_post,
+            'url': 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, filename)
+        })
