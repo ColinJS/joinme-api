@@ -98,7 +98,9 @@ class EventList(APIView):
 
             if 'video' in data:
                 with transaction.atomic():
-                    video = Video(video=data['video'])
+                    url = data['video'].replace('/input/', '/output/').split('.')[-1]+".mp4"
+
+                    video = Video(video=url)
                     video.save()
 
                     event = Event(created_by=user, duration=duration, ending_time=timezone.now()+duration)
