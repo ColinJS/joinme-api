@@ -98,9 +98,8 @@ class EventList(APIView):
 
             if 'video' in data:
                 with transaction.atomic():
-                    video = Video(video=request.FILES['video'])
+                    video = Video(video=data['video'])
                     video.save()
-
 
                     event = Event(created_by=user, duration=duration, ending_time=timezone.now()+duration)
                     event.save()
@@ -110,9 +109,16 @@ class EventList(APIView):
                     place = Place(formatted_address=place['formatted_address'], place_id=place['place_id'], event=event)
                     place.save()
 
+                    if 'friends' in data:
+                        for f in data['friends']:
+                            f_user = User.objects.filter(pk=f['id']).first()
+                            if f_user:
+                                sharing = GuestToEvent(guest=f_user, event=event, state=0)
+                                sharing.save()
+
             ctx = {
                 'id': user.my_events.last().id,
-                'uri': request.build_absolute_uri(user.my_events.last().videos.last().video.url)
+                'uri': data['video']
             }
 
             return Response(ctx)
