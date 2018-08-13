@@ -149,7 +149,7 @@ class EventList(APIView):
                         'last_name': my_event.created_by.last_name
                     },
                     'creation_date': my_event.created,
-                    'video_url': request.build_absolute_uri(my_event.videos.last().video.url)
+                    'video_url': my_event.videos.last().video
                 }
                 ctx['my_events'].append(new_event)
 
@@ -162,7 +162,7 @@ class EventList(APIView):
                         'last_name': event.created_by.last_name
                     },
                     'creation_date': event.created,
-                    'video_url': request.build_absolute_uri(event.videos.last().video.url)
+                    'video_url': event.videos.last().video
                 }
                 ctx['events'].append(new_event)
 
@@ -180,7 +180,7 @@ class EventDetails(APIView):
             event = get_object_or_404(Event, pk=event_id)
             guests = event.guests.all()
             ctx = {
-                'video_url': request.build_absolute_uri(event.videos.last().video.url),
+                'video_url': event.videos.last().video,
                 'creation_date': event.created,
                 'id': event.pk,
                 'place': {
