@@ -24,7 +24,7 @@ class Event(models.Model):
 
 class Video(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    video = models.FileField(upload_to='videos/', blank=False, null=False, default='media/anonymous.mp4')
+    video = models.URLField(blank=False, null=False, default='https://join-me.s3.amazonaws.com/input/video_.mov')
     event = models.ForeignKey(Event, related_name='videos', on_delete=models.CASCADE, blank=True, null=True)
 
 
