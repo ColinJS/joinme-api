@@ -33,7 +33,7 @@ class FirstConnection(APIView):
 
         if request.auth:
             user = request.user
-
+            print(user)
             if len(Profile.objects.filter(user__pk=user.pk)) == 0 or not user.profile.init:
 
                 # Get the avatar url of the user and store it
@@ -51,7 +51,7 @@ class FirstConnection(APIView):
                     key = 'avatar/avatar_' + hash_key + '.jpg'
                     url = 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, key)
 
-                    s3_response = s3.Bucket(S3_BUCKET).put_object(ACL='public-read', Key=key, Body=response.text)
+                    s3_response = s3.Bucket(S3_BUCKET).put_object(ACL='public-read', Key=key, Body=response.content)
 
                     print(s3_response)
 
