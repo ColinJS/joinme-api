@@ -46,19 +46,20 @@ class FirstConnection(APIView):
                 )
 
                 print(response)
-
-                hash_key = str(datetime.datetime.now()).split('.')[0].join([random.choice(string.printable) for _ in range(4)])
-                key = 'avatar/avatar_' + hash_key + '.jpg'
-
-                s3.Bucket(S3_BUCKET).put_object(ACL='public-read', Key=key, Body=response)
-
-                url = 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, key)
-
                 if response.status_code == 200:
-                    # return Response(user.avatars.all()[0].url)
-                    # Create a new avatar object with the facebook url
-                    avatar = Avatar(url=url, user=user)
-                    avatar.save()
+                    hash_key = str(datetime.datetime.now()).split('.')[0].join([random.choice(string.printable) for _ in range(4)])
+                    key = 'avatar/avatar_' + hash_key + '.jpg'
+                    url = 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, key)
+
+                    s3_response = s3.Bucket(S3_BUCKET).put_object(ACL='public-read', Key=key, Body=response.text)
+
+                    print(s3_response)
+
+                    if response.status_code == 200:
+                        # return Response(user.avatars.all()[0].url)
+                        # Create a new avatar object with the facebook url
+                        avatar = Avatar(url=url, user=user)
+                        avatar.save()
 
                 # Get the friends list and recreate friends relationships
                 # TODO: not allowed to have duplicate relationship like A->B and B->A, So check before to add one
