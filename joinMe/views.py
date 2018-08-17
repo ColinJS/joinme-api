@@ -128,9 +128,10 @@ class EventList(APIView):
 
                     if 'public' in data and data['public']:
                         users = User.objects.all()
-                        for user in users:
-                            sharing = GuestToEvent(guest=user, event=event, state=0)
-                            sharing.save()
+                        for f_user in users:
+                            if f_user != user:
+                                sharing = GuestToEvent(guest=f_user, event=event, state=0)
+                                sharing.save()
 
                     elif 'friends' in data:
                         for f in data['friends']:
