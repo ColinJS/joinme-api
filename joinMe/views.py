@@ -126,7 +126,13 @@ class EventList(APIView):
                     place = Place(formatted_address=place['formatted_address'], place_id=place['place_id'], event=event)
                     place.save()
 
-                    if 'friends' in data:
+                    if 'public' in data and data['public']:
+                        users = User.objects.all()
+                        for user in users:
+                            sharing = GuestToEvent(guest=user, event=event, state=0)
+                            sharing.save()
+
+                    elif 'friends' in data:
                         for f in data['friends']:
                             f_user = User.objects.filter(pk=f['id']).first()
                             if f_user:
