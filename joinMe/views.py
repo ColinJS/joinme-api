@@ -15,7 +15,7 @@ from django.shortcuts import get_object_or_404
 import datetime
 from django.utils import timezone
 
-import requests, os, boto3
+import requests, os, boto3, random, string
 import json
 import subprocess
 
@@ -28,6 +28,9 @@ class FirstConnection(APIView):
 
     def get(self, request, format=None):
 
+        s3 = boto3.resource('s3')
+        S3_BUCKET = os.environ.get('S3_BUCKET')
+
         if request.auth:
             user = request.user
 
@@ -38,14 +41,20 @@ class FirstConnection(APIView):
                 response = requests.get(
                     'https://graph.facebook.com/me/picture',
                     params={'access_token': user.social_auth.get(provider="facebook").extra_data['access_token'],
-                            'redirect': False,
                             'type': 'large',
                             }
                 )
+
+                hash_key = str(datetime.datetime.now()).split('.')[0].join([random.choice(string.printable) for _ in range(4)])
+                key = 'avatar/avatar_' + hash_key + '.jpg'
+                s3.Bucket(S3_BUCKET).put_object(ACL='public-read', Key=key, Body=response)
+
+                url = 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, key)
+
                 if response.status_code == 200:
                     # return Response(user.avatars.all()[0].url)
                     # Create a new avatar object with the facebook url
-                    avatar = Avatar(url= response.json()["data"]["url"], user=user)
+                    avatar = Avatar(url=url, user=user)
                     avatar.save()
 
                 # Get the friends list and recreate friends relationships
