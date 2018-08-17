@@ -45,8 +45,11 @@ class FirstConnection(APIView):
                             }
                 )
 
+                print(response)
+
                 hash_key = str(datetime.datetime.now()).split('.')[0].join([random.choice(string.printable) for _ in range(4)])
                 key = 'avatar/avatar_' + hash_key + '.jpg'
+
                 s3.Bucket(S3_BUCKET).put_object(ACL='public-read', Key=key, Body=response)
 
                 url = 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, key)
