@@ -15,7 +15,7 @@ from django.shortcuts import get_object_or_404
 import datetime
 from django.utils import timezone
 
-import requests, os, boto3, random, string
+import requests, os, boto3, random, string, time
 import json
 import subprocess
 
@@ -47,7 +47,7 @@ class FirstConnection(APIView):
 
                 print(response)
                 if response.status_code == 200:
-                    hash_key = str(datetime.datetime.now()).split('.')[0].join([random.choice(string.printable) for _ in range(4)])
+                    hash_key = str(time.time()*100).split('.')[0].join([random.choice(string.printable) for _ in range(4)])
                     key = 'avatar/avatar_' + hash_key + '.jpg'
                     url = 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, key)
 
