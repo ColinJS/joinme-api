@@ -166,6 +166,7 @@ class EventList(APIView):
                         'last_name': my_event.created_by.last_name
                     },
                     'creation_date': my_event.created,
+                    'duration': my_event.duration,
                     'video_url': my_event.videos.last().video
                 }
                 ctx['my_events'].append(new_event)
@@ -179,6 +180,7 @@ class EventList(APIView):
                         'last_name': event.created_by.last_name
                     },
                     'creation_date': event.created,
+                    'duration': event.duration,
                     'video_url': event.videos.last().video
                 }
                 ctx['events'].append(new_event)
