@@ -129,7 +129,7 @@ class EventList(APIView):
                     if 'public' in data and data['public']:
                         users = User.objects.all()
                         for f_user in users:
-                            if f_user != user:
+                            if f_user != user and f_user.pk != 1:
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
 
