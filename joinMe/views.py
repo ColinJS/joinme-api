@@ -101,6 +101,10 @@ class FirstConnection(APIView):
                 user.profile.notification_key = request.data['notification_key']
                 user.profile.save()
 
+            return Response({"notification": True})
+
+        return Response({"notification": False})
+
 
 
 class EventList(APIView):
