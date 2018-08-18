@@ -166,6 +166,8 @@ class EventList(APIView):
                         users = User.objects.all()
                         for f_user in users:
                             if f_user != user and f_user.pk != 1:
+                                if f_user.profile.notification_key != "":
+                                    send_push_message(f_user.profile.notification_key, "Join Me: New Event", "You're invited by %s to an event" % (user.first_name))
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
 
@@ -173,6 +175,8 @@ class EventList(APIView):
                         for f in data['friends']:
                             f_user = User.objects.filter(pk=f['id']).first()
                             if f_user:
+                                if f_user.profile.notification_key != "":
+                                    send_push_message(f_user.profile.notification_key, "Join Me: New Event", "You're invited by %s to an event" % (user.first_name))
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
 
@@ -274,10 +278,17 @@ class EventDetails(APIView):
             data = request.data
 
             if 'coming' in data:
-                guestToEvent = GuestToEvent.objects.filter(event__pk=event_id, guest__pk=user.pk)
+                guestsToEvent = GuestToEvent.objects.all()
+                guestToEvent = guestsToEvent.filter(event__pk=event_id, guest__pk=user.pk)
                 for g in guestToEvent:
                     g.state = data['coming']
                     g.save()
+                    for guest in guestsToEvent:
+                        f_user = guest.guest
+                        if f_user.profile.notification_key != "" and guest != g:
+                            message = 'is coming' if data['coming'] == 1 else 'is not coming'
+                            send_push_message(f_user.profile.notification_key, "Join Me: Update", "%s $s " % (g.guest.first_name,message))
+
                 return Response({'message': 'Update your state to the event is done'})
 
             return Response({'message': 'Can\'t find coming variable'})
@@ -337,6 +348,8 @@ class SharingEvent(APIView):
                     if f_user:
                         sharing = GuestToEvent(guest=f_user, event=event, state=0)
                         sharing.save()
+                        if f_user.profile.notification_key != "":
+                            send_push_message(f_user.profile.notification_key, "Join Me: New Event", "You're invited by %s to an event" % (event.created_by.first_name))
 
             ctx = {'response': []}
             guests = [gte.guest for gte in GuestToEvent.objects.filter(event__pk=event.pk)]
