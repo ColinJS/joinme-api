@@ -280,20 +280,21 @@ class EventDetails(APIView):
                 guestToEvent = guestsToEvent.filter(guest__pk=user.pk)
 
                 g = guestToEvent.first()
-                g.state = data['coming']
-                g.save()
+                if g:
+                    g.state = data['coming']
+                    g.save()
 
-                for guest in guestsToEvent:
-                    f_user = guest.guest
-                    if g.event.created_by != f_user and f_user.profile.notification_key != "" and f_user != user and data['coming'] == 1:
-                        print("send notif to %s" % f_user.first_name)
-                        send_push_message(f_user.profile.notification_key, "%s is joining %s" % (g.guest.first_name, g.event.created_by.first_name))
+                    for guest in guestsToEvent:
+                        f_user = guest.guest
+                        if g.event.created_by != f_user and f_user.profile.notification_key != "" and f_user != user and data['coming'] == 1:
+                            print("send notif to %s" % f_user.first_name)
+                            send_push_message(f_user.profile.notification_key, "%s is joining %s" % (g.guest.first_name, g.event.created_by.first_name))
 
-                if user != g.event.created_by and data['coming'] == 1:
-                    print("send notif to %s" % g.event.created_by.first_name)
-                    send_push_message(g.event.created_by.profile.notification_key, "%s is joining you" % g.guest.first_name)
+                    if user != g.event.created_by and data['coming'] == 1:
+                        print("send notif to %s" % g.event.created_by.first_name)
+                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you" % g.guest.first_name)
 
-                return Response({'message': 'Update your state to the event is done'})
+                    return Response({'message': 'Update your state to the event is done'})
 
             return Response({'message': 'Can\'t find coming variable'})
 
