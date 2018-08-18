@@ -1,26 +1,47 @@
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.models import User, Group
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+from django.contrib.auth.models import User
 from rest_framework.response import Response
-from oauth2_provider.views.generic import ProtectedResourceView
-from django.http import HttpResponse
 from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework import renderers
-from rest_framework import generics
 from django.db import transaction, IntegrityError
 from django.shortcuts import get_object_or_404
 import datetime
 from django.utils import timezone
 
 import requests, os, boto3, random, string, time
-import json
-import subprocess
+
+from exponent_server_sdk import DeviceNotRegisteredError
+from exponent_server_sdk import PushClient
+from exponent_server_sdk import PushMessage
+from exponent_server_sdk import PushResponseError
+from exponent_server_sdk import PushServerError
+from requests.exceptions import ConnectionError
+from requests.exceptions import HTTPError
 
 from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place
-from joinMe.serializers import FriendshipSerializer, UserSerializer, AvatarSerializer, EventSerializer, VideoSerializer
+
+
+# Basic arguments. You should extend this function with the push features you
+# want to use, or simply pass in a `PushMessage` object.
+def send_push_message(token, title, message, extra=None):
+    try:
+        response = PushClient().publish(
+            PushMessage(to=token,
+                        title=title,
+                        body=message,
+                        data=extra))
+    except PushServerError as exc:
+        pass
+    except (ConnectionError, HTTPError) as exc:
+        pass
+
+    try:
+        # We got a response back, but we don't know whether it's an error yet.
+        # This call raises errors so we can handle them with normal exception
+        # flows.
+        response.validate_response()
+    except DeviceNotRegisteredError:
+        pass
+    except PushResponseError as exc:
+        pass
 
 
 # TODO: Add try and catch and test ...
@@ -102,7 +123,8 @@ class FirstConnection(APIView):
                     user.profile.notification_key = request.data['notification_key']
                     user.profile.save()
 
-            return Response({"notification": True})
+                send_push_message(request.data['notification_key'], "Join Me", "You're notifications are working")
+                return Response({"notification": True})
 
         return Response({"notification": False})
 
