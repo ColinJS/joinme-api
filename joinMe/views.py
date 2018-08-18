@@ -93,6 +93,15 @@ class FirstConnection(APIView):
 
         return Response({'init': True})
 
+    def post(self, request):
+        if request.auth:
+            user = request.user
+
+            if 'notification_key' in request.data:
+                user.profile.notification_key = request.data['notification_key']
+                user.profile.save()
+
+
 
 class EventList(APIView):
 

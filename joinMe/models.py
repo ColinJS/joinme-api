@@ -6,6 +6,7 @@ from django.utils import timezone
 class Profile(models.Model):
     init = models.BooleanField(default= False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    notification_key = models.CharField(max_length=200, default="")
 
 
 class Avatar(models.Model):
