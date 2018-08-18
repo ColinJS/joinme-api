@@ -21,11 +21,10 @@ from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEven
 
 # Basic arguments. You should extend this function with the push features you
 # want to use, or simply pass in a `PushMessage` object.
-def send_push_message(token, title, message, extra=None):
+def send_push_message(token, message, extra=None):
     try:
         response = PushClient().publish(
             PushMessage(to=token,
-                        title=title,
                         body=message,
                         data=extra))
     except PushServerError as exc:
@@ -166,7 +165,7 @@ class EventList(APIView):
                         for f_user in users:
                             if f_user != user and f_user.pk != 1:
                                 if f_user.profile.notification_key != "":
-                                    send_push_message(f_user.profile.notification_key, "Join Me: New Event", "You're invited by %s to an event" % (user.first_name))
+                                    send_push_message(f_user.profile.notification_key, "You're invited by %s to an event" % (user.first_name))
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
 
@@ -175,7 +174,7 @@ class EventList(APIView):
                             f_user = User.objects.filter(pk=f['id']).first()
                             if f_user:
                                 if f_user.profile.notification_key != "":
-                                    send_push_message(f_user.profile.notification_key, "Join Me: New Event", "You're invited by %s to an event" % (user.first_name))
+                                    send_push_message(f_user.profile.notification_key, "You're invited by %s to an event" % (user.first_name))
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
 
@@ -282,11 +281,14 @@ class EventDetails(APIView):
                 for g in guestToEvent:
                     g.state = data['coming']
                     g.save()
+
                     for guest in guestsToEvent:
                         f_user = guest.guest
-                        if f_user.profile.notification_key != "" and guest != g:
-                            message = 'is coming' if data['coming'] == 1 else 'is not coming'
-                            send_push_message(f_user.profile.notification_key, "Join Me: Update", "%s $s " % (g.guest.first_name,message))
+                        if f_user.profile.notification_key != "" and f_user != user and data['coming'] == 1:
+                            send_push_message(f_user.profile.notification_key, "%s is joining %s" % (g.guest.first_name, g.event.created_by.first_name))
+
+                    if user != g.event.created_by and data['coming'] == 1:
+                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you" % g.guest.first_name)
 
                 return Response({'message': 'Update your state to the event is done'})
 
@@ -348,7 +350,7 @@ class SharingEvent(APIView):
                         sharing = GuestToEvent(guest=f_user, event=event, state=0)
                         sharing.save()
                         if f_user.profile.notification_key != "":
-                            send_push_message(f_user.profile.notification_key, "Join Me: New Event", "You're invited by %s to an event" % (event.created_by.first_name))
+                            send_push_message(f_user.profile.notification_key, "Join Me: New Event", "%s to an event" % (event.created_by.first_name))
 
             ctx = {'response': []}
             guests = [gte.guest for gte in GuestToEvent.objects.filter(event__pk=event.pk)]
