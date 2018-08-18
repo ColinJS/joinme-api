@@ -123,7 +123,6 @@ class FirstConnection(APIView):
                     user.profile.notification_key = request.data['notification_key']
                     user.profile.save()
 
-                send_push_message(request.data['notification_key'], "Join Me", "You're notifications are working")
                 return Response({"notification": True})
 
         return Response({"notification": False})
