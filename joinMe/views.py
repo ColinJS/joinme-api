@@ -165,7 +165,7 @@ class EventList(APIView):
                         for f_user in users:
                             if f_user != user and f_user.pk != 1:
                                 if f_user.profile.notification_key != "":
-                                    send_push_message(f_user.profile.notification_key, "%s invited you to join him" % (user.first_name))
+                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name))
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
 
@@ -174,7 +174,7 @@ class EventList(APIView):
                             f_user = User.objects.filter(pk=f['id']).first()
                             if f_user:
                                 if f_user.profile.notification_key != "":
-                                    send_push_message(f_user.profile.notification_key, "%s invited you to join him" % (user.first_name))
+                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name))
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
 
@@ -354,7 +354,7 @@ class SharingEvent(APIView):
                         sharing = GuestToEvent(guest=f_user, event=event, state=0)
                         sharing.save()
                         if f_user.profile.notification_key != "":
-                            send_push_message(f_user.profile.notification_key, "%s invited you to join him" % (event.created_by.first_name))
+                            send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (event.created_by.first_name))
 
             ctx = {'response': []}
             guests = [gte.guest for gte in GuestToEvent.objects.filter(event__pk=event.pk)]
