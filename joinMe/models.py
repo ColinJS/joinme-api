@@ -47,3 +47,11 @@ class Place(models.Model):
     formatted_address = models.CharField(max_length=200, blank=False)
     place_id = models.CharField(max_length=200, blank=False)
     event = models.ForeignKey(Event, related_name='place', on_delete=models.CASCADE)
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, related_name='notifications', blank=False, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, related_name='notifications', blank=False, on_delete=models.CASCADE)
+    type_of_notification = models.SmallIntegerField(choices=((0, "NEW_INVITATION"), (1, "SOMEONE_COMING")), default="NEW_INVITATION")
+    state = models.SmallIntegerField(choices=((0, "UNSEEN"), (1, "SEEN")), default="UNSEEN")
+    created = models.DateTimeField(auto_now_add=True)

@@ -16,7 +16,7 @@ from exponent_server_sdk import PushServerError
 from requests.exceptions import ConnectionError
 from requests.exceptions import HTTPError
 
-from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place
+from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place, Notification
 
 
 # Basic arguments. You should extend this function with the push features you
@@ -177,6 +177,8 @@ class EventList(APIView):
                                     send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name))
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
+                                notification = Notification(user=f_user, event=event, type_of_notification= "NEW_INVITATION")
+                                notification.save()
 
             ctx = {
                 'id': user.my_events.last().id,
@@ -286,12 +288,17 @@ class EventDetails(APIView):
 
                     for guest in guestsToEvent:
                         f_user = guest.guest
-                        if g.event.created_by != f_user and f_user.profile.notification_key != "" and f_user != user and data['coming'] == 1:
+                        if g.event.created_by != f_user and f_user != user and data['coming'] == 1:
                             print("send notif to %s" % f_user.first_name)
-                            send_push_message(f_user.profile.notification_key, "%s is joining %s" % (g.guest.first_name, g.event.created_by.first_name))
+                            notification = Notification(user=f_user, event=g.event, type_of_notification= "SOMEONE_COMING")
+                            notification.save()
+                            if f_user.profile.notification_key != "":
+                                send_push_message(f_user.profile.notification_key, "%s is joining %s" % (g.guest.first_name, g.event.created_by.first_name))
 
                     if user != g.event.created_by and data['coming'] == 1:
                         print("send notif to %s" % g.event.created_by.first_name)
+                        notification = Notification(user=g.event.created_by, event=g.event, type_of_notification= "SOMEONE_COMING")
+                        notification.save()
                         send_push_message(g.event.created_by.profile.notification_key, "%s is joining you" % g.guest.first_name)
 
                     return Response({'message': 'Update your state to the event is done'})
@@ -353,6 +360,8 @@ class SharingEvent(APIView):
                     if f_user:
                         sharing = GuestToEvent(guest=f_user, event=event, state=0)
                         sharing.save()
+                        notification = Notification(user=f_user, event=event, type_of_notification="NEW_INVITATION")
+                        notification.save()
                         if f_user.profile.notification_key != "":
                             send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (event.created_by.first_name))
 
@@ -369,6 +378,15 @@ class SharingEvent(APIView):
 
         return Response({'response': request.auth})
 
+
+class Notifications(APIView):
+
+    def get(self, request):
+        if request.auth:
+            user = request.user
+            notifications = user.notifications
+            return Response({notifications: notifications})
+        return Response({'response': "can't find notifications"})
 
 class aws_s3_interface(APIView):
 
