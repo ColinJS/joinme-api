@@ -197,14 +197,16 @@ class EventList(APIView):
 
             my_events = user.my_events.filter(ending_time__gte=now)
             events = []
+            notifications = user.notifications.filter(state=0)
 
             for e in user.events.all():
                 if e.event not in events and e.event.ending_time >= now:
                     events.append(e.event)
 
-            ctx = {'my_events': [], 'events': []}
+            ctx = {'notifications':len(notifications),'my_events': [], 'events': []}
 
             for my_event in my_events:
+                event_notif = notifications.filter(event=my_event)
                 new_event = {
                     'id': my_event.pk,
                     'creator': {
@@ -214,11 +216,13 @@ class EventList(APIView):
                     },
                     'creation_date': my_event.created,
                     'ending_time': my_event.ending_time,
-                    'video_url': my_event.videos.last().video
+                    'video_url': my_event.videos.last().video,
+                    'notifications': [{'type': notif.type_of_notification} for notif in event_notif]
                 }
                 ctx['my_events'].append(new_event)
 
             for event in events:
+                event_notif = notifications.filter(event=event)
                 new_event = {
                     'id': event.pk,
                     'creator': {
@@ -228,7 +232,8 @@ class EventList(APIView):
                     },
                     'creation_date': event.created,
                     'ending_time': event.ending_time,
-                    'video_url': event.videos.last().video
+                    'video_url': event.videos.last().video,
+                    'notifications': [{'type': notif.type_of_notification} for notif in event_notif]
                 }
                 ctx['events'].append(new_event)
 
@@ -245,6 +250,7 @@ class EventDetails(APIView):
 
             event = get_object_or_404(Event, pk=event_id)
             guests = event.guests.all()
+            notifications = user.notifications.filter(event=event, state=0)
             ctx = {
                 'video_url': event.videos.last().video,
                 'creation_date': event.created,
@@ -254,6 +260,9 @@ class EventDetails(APIView):
                     'place_id': event.place.last().place_id,
                 },
                 'ending_date': event.ending_time,
+                'notifications': [{
+                    'type': notif.type_of_notification
+                } for notif in notifications],
                 'guests': [],
             }
 
@@ -387,6 +396,34 @@ class Notifications(APIView):
             notifications = user.notifications
             return Response({notifications: notifications})
         return Response({'response': "can't find notifications"})
+
+    def put(self, request, notif_id, notif_group):
+        if request.auth:
+            user = request.user
+            notif_id = request.data["notif_id"]
+            notif_group = request.data["notif_group"]
+            if notif_group:
+                if notif_group == 'new':
+                    notifications = user.notifications.filter(type_of_notification=0, state=0)
+                    for notification in notifications:
+                        notification.state = 1
+                        notification.save()
+                elif notif_group == 'coming':
+                    notifications = user.notifications.filter(type_of_notification=1, state=0)
+                    for notification in notifications:
+                        notification.state = 1
+                        notification.save()
+                elif notif_group == 'all':
+                    notifications = user.notifications.filter(state=0)
+                    for notification in notifications:
+                        notification.state = 1
+                        notification.save()
+            else:
+                notification = user.notifications.filter(pk=notif_id)
+                notification.state = 1
+                notification.save()
+
+            return Response({'response': "done"})
 
 class aws_s3_interface(APIView):
 
