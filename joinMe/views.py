@@ -203,7 +203,7 @@ class EventList(APIView):
                 if e.event not in events and e.event.ending_time >= now:
                     events.append(e.event)
 
-            ctx = {'notifications':len(notifications),'my_events': [], 'events': []}
+            ctx = {'notifications': len(notifications), 'my_events': [], 'events': []}
 
             for my_event in my_events:
                 event_notif = notifications.filter(event=my_event)
