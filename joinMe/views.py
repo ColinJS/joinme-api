@@ -127,6 +127,20 @@ class FirstConnection(APIView):
         return Response({"notification": False})
 
 
+class Me(APIView):
+
+    def get(self, request):
+        if request.auth:
+            user = request.user
+            ctx = {
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'avatar': user.avatars.last().url,
+            }
+            return Response(ctx)
+        return Response({'error': 'User not connected'})
+
 
 class EventList(APIView):
 
