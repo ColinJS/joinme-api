@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import transaction, IntegrityError
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 import datetime
 from django.utils import timezone
 
@@ -265,6 +265,8 @@ class EventDetailsForWeb(APIView):
     def get(self, request, event_id):
         event = get_object_or_404(Event, pk=event_id)
 
+
+
         ctx = {
             'video_url': event.videos.last().video,
             'creation_date': event.created,
@@ -276,7 +278,7 @@ class EventDetailsForWeb(APIView):
             'ending_date': event.ending_time,
         }
 
-        return Response(ctx)
+        return render(request, 'templates/events.html', ctx)
 
 
 class EventDetails(APIView):
