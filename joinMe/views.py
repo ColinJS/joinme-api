@@ -262,7 +262,7 @@ class EventDetailsForWeb(APIView):
 
     permission_classes = []
 
-    def get(self, event_id):
+    def get(self, request, event_id):
         event = get_object_or_404(Event, pk=event_id)
 
         ctx = {
