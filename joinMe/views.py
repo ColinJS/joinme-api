@@ -258,6 +258,27 @@ class EventList(APIView):
         return Response({'response': request.auth})
 
 
+class EventDetailsForWeb(APIView):
+
+    permission_classes = []
+
+    def get(self, event_id):
+        event = get_object_or_404(Event, pk=event_id)
+
+        ctx = {
+            'video_url': event.videos.last().video,
+            'creation_date': event.created,
+            'id': event.pk,
+            'place': {
+                'formatted_address': event.place.last().formatted_address,
+                'place_id': event.place.last().place_id,
+            },
+            'ending_date': event.ending_time,
+        }
+
+        return Response(ctx)
+
+
 class EventDetails(APIView):
     # TODO: return the event info
     def get(self, request, event_id):
