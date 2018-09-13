@@ -278,7 +278,7 @@ class EventDetailsForWeb(APIView):
             'ending_date': event.ending_time,
         }
 
-        return render(request, 'templates/events.html', ctx)
+        return render(request, 'events.html', ctx)
 
 
 class EventDetails(APIView):
