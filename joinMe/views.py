@@ -180,6 +180,8 @@ class EventList(APIView):
                             if f_user != user and f_user.pk != 1:
                                 if f_user.profile.notification_key != "":
                                     send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name))
+                                notification = Notification(user=f_user, event=event, type_of_notification="NEW_INVITATION")
+                                notification.save()
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
 
