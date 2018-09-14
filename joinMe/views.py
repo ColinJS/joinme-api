@@ -265,10 +265,12 @@ class EventDetailsForWeb(APIView):
     def get(self, request, event_id):
         event = get_object_or_404(Event, pk=event_id)
 
-
+        video_url = event.videos.last().video
+        video_url_webm = video_url.replace('.mp4', '.webm')
 
         ctx = {
-            'video_url': event.videos.last().video,
+            'video_url': video_url,
+            'video_url_webm': video_url_webm,
             'creation_date': event.created,
             'id': event.pk,
             'place': {
