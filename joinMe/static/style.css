@@ -13,6 +13,14 @@ body {
     width: 100%;
 }
 
+.blured-video {
+    -webkit-filter: blur(10px) brightness(50%);
+    -moz-filter: blur(10px) brightness(50%);
+    -o-filter: blur(10px) brightness(50%);
+    -ms-filter: blur(10px) brightness(50%);
+    filter: blur(10px) brightness(50%);
+}
+
 .absolute-over {
     position: absolute;
     top: 0;

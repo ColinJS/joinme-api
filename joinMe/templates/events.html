@@ -7,11 +7,23 @@
 </head>
 
 <body>
-    <video class="full-video" autoplay>
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&autoLogAppEvents=1&version=v3.1&appId=216524539214115';
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+
+    <video class="full-video blured-video" autoplay>
         <source src="{{video_url}}" type="video/mp4">
         Your browser does not support the video tag.
     </video>
     <div class="absolute-over">
+        <div>
+            Get the app.
+        </div>
         <div class="logo-banniere">
             <div class="logo-container">
                 <a href="http://apple.com/"><img class="logo" src="https://join-me.app/wp-content/uploads/2018/09/badge-appstore-300x78.png"></a>
@@ -20,9 +32,9 @@
                 <a href="https://play.google.com/store/apps/details?id=fr.joinme.joinmeapplication"><img class="logo" src="https://join-me.app/wp-content/uploads/2018/09/badge-google-play-300x78.png"></a>
             </div>
         </div>
-        <div> or </div>
+        <div> OR </div>
         <div>
-            <div> Login with facebook </div>
+            <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="false" data-use-continue-as="false"></div>
         </div>
     </div>
 
