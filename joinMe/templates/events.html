@@ -15,9 +15,16 @@
       js = d.createElement(s); js.id = id;
       js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&autoLogAppEvents=1&version=v3.1&appId=216524539214115';
       fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));</script>
+    }(document, 'script', 'facebook-jssdk'));
 
-    <video class="full-video blured-video">
+    var video = document.getElementById('video');
+    video.addEventListener('click',function(){
+        video.play();
+    },false);
+
+    </script>
+
+    <video id="video" class="full-video blured-video">
         <source src="{{video_url}}" type="video/mp4">
         Your browser does not support the video tag.
     </video>
