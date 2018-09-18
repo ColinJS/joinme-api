@@ -296,6 +296,12 @@ class EventDetails(APIView):
                 'video_url': event.videos.last().video,
                 'creation_date': event.created,
                 'id': event.pk,
+                'creator': {
+                    'id': event.created_by.pk,
+                    'first_name': event.created_by.first_name,
+                    'last_name': event.created_by.last_name,
+                    'avatar': event.created_by.avatars.last().url
+                },
                 'place': {
                     'formatted_address': event.place.last().formatted_address,
                     'place_id': event.place.last().place_id,
