@@ -297,6 +297,7 @@ class EventDetails(APIView):
                 'creation_date': event.created,
                 'id': event.pk,
                 'creator': {
+                    'is_me': event.created_by.pk == user.pk,
                     'id': event.created_by.pk,
                     'first_name': event.created_by.first_name,
                     'last_name': event.created_by.last_name,
