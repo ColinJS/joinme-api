@@ -270,7 +270,7 @@ class EventDetailsForWeb(APIView):
 
         ctx = {
             'video_url': video_url,
-            'video_url_webm': video_url_webm,
+            'video_thumb_url': video_url_webm,
             'creation_date': event.created,
             'id': event.pk,
             'place': {
