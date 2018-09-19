@@ -68,7 +68,7 @@ class FirstConnection(APIView):
                 print(response)
                 if response.status_code == 200:
                     hash_key = str(time.time()*100).split('.')[0].join([random.choice(string.printable) for _ in range(4)])
-                    key = 'avatar/avatar_' + urllib.quote_plus(hash_key) + '.jpg'
+                    key = 'avatar/avatar_' + urllib.parse.quote_plus(hash_key) + '.jpg'
                     url = 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, key)
 
                     s3_response = s3.Bucket(S3_BUCKET).put_object(ACL='public-read', Key=key, Body=response.content)
