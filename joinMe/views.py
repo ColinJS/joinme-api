@@ -67,7 +67,7 @@ class FirstConnection(APIView):
 
                 print(response)
                 if response.status_code == 200:
-                    hash_key = str(time.time()*100).split('.')[0].join([random.choice(string.printable) for _ in range(4)])
+                    hash_key = str(time.time()*100).split('.')[0].join([random.choice(string.ascii_letters + string.digits) for _ in range(4)])
                     key = 'avatar/avatar_' + urllib.parse.quote_plus(hash_key) + '.jpg'
                     url = 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, key)
 
