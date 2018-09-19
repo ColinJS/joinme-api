@@ -33,14 +33,14 @@ class Friendship(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     creator = models.ForeignKey(User, related_name='friendship_creator', on_delete=models.CASCADE, blank=False)
     friend = models.ForeignKey(User, related_name='friendship_friend', on_delete=models.CASCADE, blank=False)
-    state = models.SmallIntegerField(choices=((0, "PENDING"), (1, "ACCEPTED"), (2, "BLOCKED")), default="PENDING")
+    state = models.SmallIntegerField(choices=((0, "PENDING"), (1, "ACCEPTED"), (2, "BLOCKED")), default=0)
 
 
 class GuestToEvent(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     guest = models.ForeignKey(User, related_name='events', blank=True, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='guests', blank=True, on_delete=models.CASCADE)
-    state = models.SmallIntegerField(choices=((0, "PENDING"), (1, "ACCEPTED"), (2, "REFUSED")), default="PENDING")
+    state = models.SmallIntegerField(choices=((0, "PENDING"), (1, "ACCEPTED"), (2, "REFUSED")), default=0)
 
 
 class Place(models.Model):
@@ -52,6 +52,6 @@ class Place(models.Model):
 class Notification(models.Model):
     user = models.ForeignKey(User, related_name='notifications', blank=False, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='notifications', blank=False, on_delete=models.CASCADE)
-    type_of_notification = models.SmallIntegerField(choices=((0, "NEW_INVITATION"), (1, "SOMEONE_COMING")), default="NEW_INVITATION")
-    state = models.SmallIntegerField(choices=((0, "UNSEEN"), (1, "SEEN")), default="UNSEEN")
+    type_of_notification = models.SmallIntegerField(choices=((0, "NEW_INVITATION"), (1, "SOMEONE_COMING")), default=0)
+    state = models.SmallIntegerField(choices=((0, "UNSEEN"), (1, "SEEN")), default=0)
     created = models.DateTimeField(auto_now_add=True)
