@@ -171,7 +171,7 @@ class EventList(APIView):
                     event.videos.set([video])
                     event.save()
 
-                    place = Place(formatted_address=place['formatted_address'], place_id=place['place_id'], event=event)
+                    place = Place(formatted_address=place.get('formatted_address', ''), place_id=place.get('place_id', ''),event=event)
                     place.save()
 
                     if 'public' in data and data['public']:
