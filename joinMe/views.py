@@ -156,13 +156,14 @@ class Users(APIView):
 
             ctx = {'users': []}
             for user in users:
-                new_user = {
-                    'id': user.pk,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'avatar': user.avatars.last().url if user.avatars and user.avatars.last() else '',
-                }
-                ctx['users'].append(new_user)
+                if user.username != "admin":
+                    new_user = {
+                        'id': user.pk,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'avatar': user.avatars.last().url if user.avatars and user.avatars.last() else '',
+                    }
+                    ctx['users'].append(new_user)
 
             return Response(ctx)
 
