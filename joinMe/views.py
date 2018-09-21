@@ -437,6 +437,20 @@ class FriendList(APIView):
 
         return Response({'response': request.auth})
 
+    def post(self, request):
+        if request.auth:
+            user = request.user
+            if request.data['friend_id']:
+                friend = User.objects.filter(pk=request.data['friend_id']).first()
+                if friend:
+                    friendship = Friendship(creator=user, friend=friend, state=1)
+                    friendship.save()
+
+                    return Response({"message": "Done"})
+                return Response({"error": "No friend found"})
+            return Response({"error": "Need a friend_id"})
+        return Response({"error": "You're not authentified"})
+
 class SharingEvent(APIView):
 
     def put(self, request, event_id):
