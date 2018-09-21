@@ -142,6 +142,31 @@ class Me(APIView):
         return Response({'error': 'User not connected'})
 
 
+class Users(APIView):
+
+    def get(self, request):
+        if request.auth:
+            user = request.user
+            users = User.objects.all()
+            filter = request.query_params.get('filter', '')
+            if filter == 'no-friends':
+                from django.db.models import Q
+                users = users.filter(~Q(Q(friendship_creator__friend=user, friendship_creator__state=1) |
+                                        Q(friendship_friend__creator=user, friendship_friend__state=1)))
+
+            ctx = {'users': []}
+            for user in users:
+                new_user = {
+                    'id': user.pk,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'avatar': user.avatars.last().url if user.avatars and user.avatars.last() else '',
+                }
+                ctx['users'].append(new_user)
+
+            return Response(ctx)
+
+
 class EventList(APIView):
 
     def post(self, request):
