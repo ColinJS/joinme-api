@@ -148,8 +148,8 @@ class Users(APIView):
         if request.auth:
             user = request.user
             users = User.objects.all()
-            filter = request.query_params.get('filter', '')
-            if filter == 'no-friends':
+            filtered = request.query_params.get('filter', '')
+            if filtered == 'no-friends':
                 from django.db.models import Q
                 users = users.filter(~Q(Q(friendship_creator__friend=user, friendship_creator__state=1) |
                                         Q(friendship_friend__creator=user, friendship_friend__state=1)))
