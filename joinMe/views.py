@@ -443,8 +443,11 @@ class FriendList(APIView):
             if request.data['friend_id']:
                 friend = User.objects.filter(pk=request.data['friend_id']).first()
                 if friend:
-                    friendship = Friendship(creator=user, friend=friend, state=1)
-                    friendship.save()
+                    from django.db.models import Q
+                    alreadyExist = Friendship.objects.filter(Q(creator=user, friend=friend) | Q(creator=friend, friend=user)).first()
+                    if not alreadyExist:
+                        friendship = Friendship(creator=user, friend=friend, state=1)
+                        friendship.save()
 
                     return Response({"message": "Done"})
                 return Response({"error": "No friend found"})
