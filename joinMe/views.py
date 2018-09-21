@@ -467,7 +467,7 @@ class SharingEvent(APIView):
 
             event = get_object_or_404(Event, pk=event_id)
 
-            if event.created_by == user or event.guests.guest.filter(pk=user.pk):
+            if event.created_by == user or event.guests.filter(pk=user.pk):
 
                 for f in request.data['friends']:
                     f_user = User.objects.filter(pk=f['id']).first()
