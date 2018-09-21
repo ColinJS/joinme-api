@@ -448,6 +448,8 @@ class FriendList(APIView):
                     if not alreadyExist:
                         friendship = Friendship(creator=user, friend=friend, state=1)
                         friendship.save()
+                        if friend.profile.notification_key != "":
+                            send_push_message(friend.profile.notification_key, "You and %s are friend now!" % (user.first_name))
 
                     return Response({"message": "Done"})
                 return Response({"error": "No friend found"})
