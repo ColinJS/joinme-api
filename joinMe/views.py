@@ -329,6 +329,16 @@ class EventDetails(APIView):
 
         return Response({'response': request.auth})
 
+    def delete(self, request, event_id):
+        if request.auth:
+            user = request.user
+            event = Event.objects.filter(pk=event_id, created_by=user).first()
+            event.delete()
+            return Response({'message': 'Event deleted'})
+        return Response({'message': 'Authentication denied'})
+
+
+
     def put(self, request, event_id):
         if request.auth:
             user = request.user
