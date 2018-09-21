@@ -146,19 +146,19 @@ class Users(APIView):
 
     def get(self, request):
         if request.auth:
-            user = request.user
+            me = request.user
             users = User.objects.all()
             filtered = request.query_params.get('filter', '')
             print(request.query_params)
             print(filtered)
-            if filtered == 'no-friends?':
+            if filtered == 'no-friends?':  # TODO: the ? is automatically added at the end of the url. Will have to debug that
                 from django.db.models import Q
                 users = users.filter(~Q(Q(friendship_creator__friend=user, friendship_creator__state=1) |
                                         Q(friendship_friend__creator=user, friendship_friend__state=1)))
 
             ctx = {'users': []}
             for user in users:
-                if user.username != "admin":
+                if user.username != "admin" and me != user:
                     new_user = {
                         'id': user.pk,
                         'first_name': user.first_name,
