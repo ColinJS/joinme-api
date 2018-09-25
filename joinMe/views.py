@@ -403,16 +403,22 @@ class EventDetails(APIView):
         return Response({'response': request.auth})
 
 
-
-
 class FriendList(APIView):
 
     def get(self, request):
         if request.auth:
             user = request.user
+            event_id = request.query_params.get('event_id', -1)
+            event = Event.objects.filter(pk=event_id).first()
 
             create_friendship = Friendship.objects.distinct().filter(creator__pk=user.pk).filter(state=1)
             friend_friendship = Friendship.objects.distinct().filter(friend__pk=user.pk).filter(state=1)
+
+            if event:
+                list_of_participants = list(event.guests.all().values_list('pk', flat=True))
+                list_of_participants.append(event.created_by.pk)
+                create_friendship.exclude(pk__in=list_of_participants)
+                friend_friendship.exclude(pk__in=list_of_participants)
 
             ctx = {'friends': []}
             for friend in create_friendship:
@@ -476,7 +482,7 @@ class SharingEvent(APIView):
                 for f in request.data['friends']:
                     f_user = User.objects.filter(pk=f['id']).first()
                     print(f_user)
-                    if f_user:
+                    if f_user and f_user != event.created_by:
                         sharing = GuestToEvent(guest=f_user, event=event, state=0)
                         sharing.save()
                         print(sharing)
@@ -484,7 +490,6 @@ class SharingEvent(APIView):
                         notification.save()
                         if f_user.profile.notification_key != "":
                             send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (event.created_by.first_name))
-
 
             ctx = {'response': []}
             guests = [gte.guest for gte in GuestToEvent.objects.filter(event__pk=event.pk)]
