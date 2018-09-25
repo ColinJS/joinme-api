@@ -408,7 +408,7 @@ class FriendList(APIView):
     def get(self, request):
         if request.auth:
             user = request.user
-            event_id = request.query_params.get('event_id', -1)
+            event_id = int(request.query_params.get('event_id', '-1?').replace('?', ''))
             event = Event.objects.filter(pk=event_id).first()
 
             create_friendship = Friendship.objects.distinct().filter(creator__pk=user.pk).filter(state=1)
