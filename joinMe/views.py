@@ -471,6 +471,7 @@ class SharingEvent(APIView):
             if event.created_by == user or event.guests.filter(guest_id=user.pk).first():
 
                 print('We get the event and we can add friends')
+                print(request.data['friends'])
 
                 for f in request.data['friends']:
                     f_user = User.objects.filter(pk=f['id']).first()
