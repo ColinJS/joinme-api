@@ -241,7 +241,7 @@ class EventList(APIView):
 
             my_events = user.my_events.filter(ending_time__gte=now)
             events = []
-            notifications = user.notifications.filter(state=0)
+            notifications = user.notifications.filter(event__ending_time__gte=now, state=0)
 
             for e in user.events.all():
                 if e.event not in events and e.event.ending_time >= now:
@@ -320,7 +320,6 @@ class EventDetails(APIView):
             event = get_object_or_404(Event, pk=event_id)
             guests = event.guests.all()
             notifications = user.notifications.filter(event=event)
-            print(notifications)
 
             ctx = {
                 'video_url': event.videos.last().video,
@@ -345,8 +344,6 @@ class EventDetails(APIView):
             }
 
             notifications.delete()
-
-            print(notifications)
 
             for guest in guests:
                 new_guest = {
