@@ -411,19 +411,18 @@ class FriendList(APIView):
             event_id = int(request.query_params.get('event_id', '-1?').replace('?', ''))
             event = Event.objects.filter(pk=event_id).first()
 
-            create_friendship = Friendship.objects.distinct().filter(creator__pk=user.pk, state=1)
-            friend_friendship = Friendship.objects.distinct().filter(friend__pk=user.pk, state=1)
+            from django.db.models import Q
+
+            friends = User.objects.distinct().filter(Q(friendship_creator__friend__pk=user.pk, friendship_creator__state=1) |
+                                          Q(friendship_friend__creator__pk=user.pk, friendship_friend__state=1)).order_by('last_name')
 
             if event:
                 list_of_participants = list(event.guests.all().values_list('guest__pk', flat=True))
                 list_of_participants.append(event.created_by.pk)
-                create_friendship = create_friendship.exclude(friend__pk__in=list_of_participants)
-                friend_friendship = friend_friendship.exclude(creator__pk__in=list_of_participants)
-
-            friendship_list = (create_friendship.values('friend') | friend_friendship.values('creator')).distinct().order_by('last_name')
+                friends = friends.exclude(pk__in=list_of_participants)
 
             ctx = {'friends': []}
-            for friend in friendship_list:
+            for friend in friends:
                 new_friend = {
                     'id': friend.pk,
                     'first_name': friend.first_name,
