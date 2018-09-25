@@ -281,7 +281,7 @@ class EventList(APIView):
                 }
                 ctx['events'].append(new_event)
 
-            print(ctx
+            print(ctx)
 
             return Response(ctx)
 
