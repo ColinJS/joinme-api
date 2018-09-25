@@ -413,11 +413,11 @@ class FriendList(APIView):
             event = Event.objects.filter(pk=event_id).first()
             print(event)
 
-            create_friendship = Friendship.objects.distinct().filter(creator__pk=user.pk).filter(state=1)
-            friend_friendship = Friendship.objects.distinct().filter(friend__pk=user.pk).filter(state=1)
+            create_friendship = Friendship.objects.distinct().filter(creator__pk=user.pk, state=1)
+            friend_friendship = Friendship.objects.distinct().filter(friend__pk=user.pk, state=1)
 
             if event:
-                list_of_participants = list(event.guests.all().values_list('pk', flat=True))
+                list_of_participants = list(event.guests.all().values_list('guest__pk', flat=True))
                 print(list_of_participants)
                 list_of_participants.append(event.created_by.pk)
                 print(list_of_participants)
