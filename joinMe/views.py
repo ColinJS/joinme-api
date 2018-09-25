@@ -409,23 +409,21 @@ class FriendList(APIView):
         if request.auth:
             user = request.user
             event_id = int(request.query_params.get('event_id', '-1?').replace('?', ''))
-            print(event_id)
             event = Event.objects.filter(pk=event_id).first()
-            print(event)
 
             create_friendship = Friendship.objects.distinct().filter(creator__pk=user.pk, state=1)
             friend_friendship = Friendship.objects.distinct().filter(friend__pk=user.pk, state=1)
 
             if event:
                 list_of_participants = list(event.guests.all().values_list('guest__pk', flat=True))
-                print(list_of_participants)
                 list_of_participants.append(event.created_by.pk)
-                print(list_of_participants)
                 create_friendship = create_friendship.exclude(friend__pk__in=list_of_participants)
                 friend_friendship = friend_friendship.exclude(creator__pk__in=list_of_participants)
 
+            friendship_list = (create_friendship | friend_friendship).distinct().order_by('last_name')
+
             ctx = {'friends': []}
-            for friend in create_friendship:
+            for friend in friendship_list:
                 new_friend = {
                     'id': friend.friend.pk,
                     'first_name': friend.friend.first_name,
@@ -433,17 +431,6 @@ class FriendList(APIView):
                     'avatar': friend.friend.avatars.last().url if friend.friend.avatars and friend.friend.avatars.last() else '',
                 }
                 ctx['friends'].append(new_friend)
-
-            for friend in friend_friendship:
-                myId = friend.creator.pk
-                if len([c for c in ctx['friends'] if myId == c['id']]) == 0:
-                    new_friend = {
-                        'id': friend.creator.pk,
-                        'first_name': friend.creator.first_name,
-                        'last_name': friend.creator.last_name,
-                        'avatar': friend.creator.avatars.last().url if friend.creator.avatars and friend.creator.avatars.last() else '',
-                    }
-                    ctx['friends'].append(new_friend)
 
             return Response(ctx)
 
