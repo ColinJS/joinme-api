@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 import datetime
 from django.utils import timezone
 
+
 class Profile(models.Model):
     init = models.BooleanField(default= False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -20,7 +21,6 @@ class Event(models.Model):
     created_by = models.ForeignKey(User, related_name='my_events', on_delete=models.DO_NOTHING, blank=True)
     duration = models.DurationField(blank=True, default=datetime.timedelta(hours=3))
     ending_time = models.DateTimeField(default=timezone.now()+datetime.timedelta(hours=3))
-
 
 
 class Video(models.Model):

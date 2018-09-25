@@ -458,6 +458,7 @@ class FriendList(APIView):
             return Response({"error": "Need a friend_id"})
         return Response({"error": "You're not authentified"})
 
+
 class SharingEvent(APIView):
 
     def put(self, request, event_id):
@@ -469,15 +470,20 @@ class SharingEvent(APIView):
 
             if event.created_by == user or event.guests.filter(guest_id=user.pk).first():
 
+                print('We get the event and we can add friends')
+
                 for f in request.data['friends']:
                     f_user = User.objects.filter(pk=f['id']).first()
+                    print(f_user)
                     if f_user:
                         sharing = GuestToEvent(guest=f_user, event=event, state=0)
                         sharing.save()
+                        print(sharing)
                         notification = Notification(user=f_user, event=event, type_of_notification=0)
                         notification.save()
                         if f_user.profile.notification_key != "":
                             send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (event.created_by.first_name))
+
 
             ctx = {'response': []}
             guests = [gte.guest for gte in GuestToEvent.objects.filter(event__pk=event.pk)]
