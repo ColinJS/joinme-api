@@ -420,15 +420,15 @@ class FriendList(APIView):
                 create_friendship = create_friendship.exclude(friend__pk__in=list_of_participants)
                 friend_friendship = friend_friendship.exclude(creator__pk__in=list_of_participants)
 
-            friendship_list = (create_friendship | friend_friendship).distinct().order_by('last_name')
+            friendship_list = (create_friendship.values('friend') | friend_friendship.values('creator')).distinct().order_by('last_name')
 
             ctx = {'friends': []}
             for friend in friendship_list:
                 new_friend = {
-                    'id': friend.friend.pk,
-                    'first_name': friend.friend.first_name,
-                    'last_name': friend.friend.last_name,
-                    'avatar': friend.friend.avatars.last().url if friend.friend.avatars and friend.friend.avatars.last() else '',
+                    'id': friend.pk,
+                    'first_name': friend.first_name,
+                    'last_name': friend.last_name,
+                    'avatar': friend.avatars.last().url if friend.avatars and friend.avatars.last() else '',
                 }
                 ctx['friends'].append(new_friend)
 
