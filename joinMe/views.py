@@ -281,8 +281,6 @@ class EventList(APIView):
                 }
                 ctx['events'].append(new_event)
 
-            print(ctx)
-
             return Response(ctx)
 
         return Response({'response': request.auth})
@@ -321,7 +319,7 @@ class EventDetails(APIView):
 
             event = get_object_or_404(Event, pk=event_id)
             guests = event.guests.all()
-            notifications = user.notifications.filter(event=event, state=0)
+            notifications = user.notifications.filter(event=event)
 
             ctx = {
                 'video_url': event.videos.last().video,
