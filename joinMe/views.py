@@ -281,6 +281,8 @@ class EventList(APIView):
                 }
                 ctx['events'].append(new_event)
 
+            print(ctx
+
             return Response(ctx)
 
         return Response({'response': request.auth})
@@ -352,8 +354,6 @@ class EventDetails(APIView):
                 }
                 if new_guest not in ctx['guests']:
                     ctx['guests'].append(new_guest)
-
-            print(ctx)
 
             return Response(ctx)
 
