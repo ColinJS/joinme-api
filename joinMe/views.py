@@ -418,9 +418,11 @@ class FriendList(APIView):
 
             if event:
                 list_of_participants = list(event.guests.all().values_list('pk', flat=True))
+                print(list_of_participants)
                 list_of_participants.append(event.created_by.pk)
-                create_friendship = create_friendship.exclude(pk__in=list_of_participants)
-                friend_friendship = friend_friendship.exclude(pk__in=list_of_participants)
+                print(list_of_participants)
+                create_friendship = create_friendship.exclude(friend__pk__in=list_of_participants)
+                friend_friendship = friend_friendship.exclude(creator__pk__in=list_of_participants)
 
             ctx = {'friends': []}
             for friend in create_friendship:
