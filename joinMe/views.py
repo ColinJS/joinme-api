@@ -320,6 +320,7 @@ class EventDetails(APIView):
             event = get_object_or_404(Event, pk=event_id)
             guests = event.guests.all()
             notifications = user.notifications.filter(event=event)
+            print(notifications)
 
             ctx = {
                 'video_url': event.videos.last().video,
@@ -344,6 +345,8 @@ class EventDetails(APIView):
             }
 
             notifications.delete()
+
+            print(notifications)
 
             for guest in guests:
                 new_guest = {
