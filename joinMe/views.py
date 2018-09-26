@@ -393,13 +393,13 @@ class EventDetails(APIView):
                             notification = Notification(user=f_user, event=g.event, type_of_notification=1)
                             notification.save()
                             if f_user.profile.notification_key != "":
-                                send_push_message(f_user.profile.notification_key, "%s is joining %s" % (g.guest.first_name, g.event.created_by.first_name))
+                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name))
 
                     if user != g.event.created_by and data['coming'] == 1:
                         print("send notif to %s" % g.event.created_by.first_name)
                         notification = Notification(user=g.event.created_by, event=g.event, type_of_notification=1)
                         notification.save()
-                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you" % g.guest.first_name)
+                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name)
 
                     return Response({'message': 'Update your state to the event is done'})
 
