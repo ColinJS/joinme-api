@@ -258,6 +258,7 @@ class EventList(APIView):
                         'first_name': my_event.created_by.first_name,
                         'last_name': my_event.created_by.last_name
                     },
+                    'coming': 3,
                     'creation_date': my_event.created,
                     'ending_time': my_event.ending_time,
                     'video_url': my_event.videos.last().video,
@@ -274,6 +275,7 @@ class EventList(APIView):
                         'first_name': event.created_by.first_name,
                         'last_name': event.created_by.last_name
                     },
+                    'coming': event.guests.filter(guest=user).first().state,
                     'creation_date': event.created,
                     'ending_time': event.ending_time,
                     'video_url': event.videos.last().video,
