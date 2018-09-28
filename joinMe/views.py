@@ -133,6 +133,7 @@ class Me(APIView):
         if request.auth:
             user = request.user
             ctx = {
+                'id': user.pk,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'email': user.email,
