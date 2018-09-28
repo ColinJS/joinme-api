@@ -155,7 +155,7 @@ class Users(APIView):
             if filtered == 'no-friends?':  # TODO: the ? is automatically added at the end of the url. Will have to debug that
                 from django.db.models import Q
                 users = users.filter(~Q(Q(friendship_creator__friend=me, friendship_creator__state=1) |
-                                        Q(friendship_friend__creator=me, friendship_friend__state=1)))
+                                        Q(friendship_friend__creator=me, friendship_friend__state=1))).order_by('last_name')
 
             ctx = {'users': []}
             for user in users:
