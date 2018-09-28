@@ -251,6 +251,10 @@ class EventList(APIView):
             ctx = {'notifications': len(notifications), 'my_events': [], 'events': []}
 
             for my_event in my_events:
+                video_url = my_event.videos.last().video
+                thumb_url_splitted = video_url.rsplit('/', 1)
+                thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
+
                 event_notif = notifications.filter(event=my_event)
                 new_event = {
                     'id': my_event.pk,
@@ -262,7 +266,8 @@ class EventList(APIView):
                     'coming': 3,
                     'creation_date': my_event.created,
                     'ending_time': my_event.ending_time,
-                    'video_url': my_event.videos.last().video,
+                    'video_url': video_url,
+                    'thumb_url': thumb_url,
                     'notifications': [{'type': notif.type_of_notification} for notif in event_notif]
                 }
                 ctx['my_events'].append(new_event)
