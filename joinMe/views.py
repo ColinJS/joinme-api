@@ -323,9 +323,13 @@ class EventDetails(APIView):
             event = get_object_or_404(Event, pk=event_id)
             guests = event.guests.all()
             notifications = user.notifications.filter(event=event)
+            video_url = event.videos.last().video
+            thumb_url_splitted = video_url.rsplit('/', 1)
+            thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
 
             ctx = {
-                'video_url': event.videos.last().video,
+                'video_url': video_url,
+                'thumb_url': thumb_url,
                 'creation_date': event.created,
                 'id': event.pk,
                 'creator': {
