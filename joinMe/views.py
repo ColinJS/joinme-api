@@ -106,7 +106,7 @@ class FirstConnection(APIView):
                 'id': user.id,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
-                'avatar': user.avatars.last().url,
+                'avatar': user.avatars.last().url if user.avatars and user.avatars.last() else '',
             }
 
             return Response(ctx)
@@ -137,7 +137,7 @@ class Me(APIView):
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'email': user.email,
-                'avatar': user.avatars.last().url,
+                'avatar': user.avatars.last().url if user.avatars and user.avatars.last() else '',
             }
             return Response(ctx)
         return Response({'error': 'User not connected'})
