@@ -153,7 +153,7 @@ class Users(APIView):
             search = request.query_params.get('search', '')
             if search != '':
                 from django.db.models import Q
-                users = users.filter(Q(first_name__icontains=search) | Q(last_name__icontains=search))
+                users = users.filter(Q(first_name__unaccent__icontains=search) | Q(last_name__unaccent__icontains=search))
             print(request.query_params)
             print(filtered)
             if filtered == 'no-friends?':  # TODO: the ? is automatically added at the end of the url. Will have to debug that
