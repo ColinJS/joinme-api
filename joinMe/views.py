@@ -153,7 +153,7 @@ class Users(APIView):
             filtered = request.query_params.get('filter', '')
             search = request.query_params.get('search', '')
             if search != '':
-                filtered_users = users.filter(first_name__icontains=search) + users.filter(last_name__icontains=search)
+                filtered_users = users.filter(first_name__icontains=search) | users.filter(last_name__icontains=search)
             print(request.query_params)
             print(filtered)
             if filtered == 'no-friends?':  # TODO: the ? is automatically added at the end of the url. Will have to debug that
