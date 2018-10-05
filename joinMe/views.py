@@ -311,7 +311,7 @@ class EventDetailsForWeb(APIView):
         event = get_object_or_404(Event, pk=event_id)
 
         video_url = event.videos.last().video
-        video_url_webm = video_url.replace('.mp4', '.webm')
+        video_url_webm = video_url.replace('.mp4', '.gif')
 
         ctx = {
             'video_url': video_url,
