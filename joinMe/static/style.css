@@ -45,6 +45,8 @@ body {
 }
 
 .joinme-app {
+    width: 90%;
+    max-width: 350px;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
