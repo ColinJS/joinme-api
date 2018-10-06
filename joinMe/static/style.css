@@ -38,9 +38,10 @@ body {
 .joinme-logo {
     width: 90%;
     max-width: 350px;
-    img {
-        width: 100%;
-    }
+}
+
+.joinme-logo img {
+    width: 100%;
 }
 
 .joinme-app {
@@ -48,12 +49,15 @@ body {
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
-    .app-logo {
-        width: 30%;
-        img {
-            width: 100%;
-        }
-    }
+
+}
+.joinme-app .app-logo {
+    width: 30%;
+
+}
+
+.joinme-app .app-logo img {
+    width: 100%;
 }
 
 .logo-banniere {
