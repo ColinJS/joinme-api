@@ -35,6 +35,27 @@ body {
     align-items: center;
 }
 
+.joinme-logo {
+    width: 90%;
+    max-width: 350px;
+    img {
+        width: 100%;
+    }
+}
+
+.joinme-app {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    .app-logo {
+        width: 30%;
+        img {
+            width: 100%;
+        }
+    }
+}
+
 .logo-banniere {
     display: flex;
     width: 97%;
