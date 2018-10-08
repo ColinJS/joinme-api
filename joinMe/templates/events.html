@@ -38,18 +38,20 @@
 
     </script>
 
+    <img src="{{video_thumb_url}}" class="full-video blured-video"/>
+    <!--
     <video id="video" preload="auto" autobuffer class="full-video blured-video" autoplay>
-        <img src="{{video_thumb_url}}">
+        <source src="{{video_url}}" type="video/mp4">
         Your browser does not support the video tag.
     </video>
-
+    -->
     <div class="absolute-over">
         <div class="joinme-logo">
             <img src="https://s3-eu-west-1.amazonaws.com/join-me/watermark-joinme.png" />
         </div>
         <div class="joinme-app">
             <div class="app-logo">
-                <a href="exp://expo.io/@colin.jeansaunier/joinme"><img src="https://s3-eu-west-1.amazonaws.com/join-me/icon-joinme.png"></a>
+                <a href="exp://expo.io/@colin.jeansaunier/joinme/event/{{id}}"><img src="https://s3-eu-west-1.amazonaws.com/join-me/icon-joinme.png"></a>
             </div>
             <div class="app-text">Get the app.</div>
         </div>
