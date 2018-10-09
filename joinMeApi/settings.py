@@ -40,7 +40,7 @@ if os.environ.get('ENV') == 'PRODUCTION':
 else:
     DEBUG = True
 
-ALLOWED_HOSTS = ['joinmeapi-dev.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ['joinmeapi-dev.herokuapp.com', '127.0.0.1', 'joinmeapi.herokuapp.com']
 
 
 # Application definition
@@ -156,7 +156,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
