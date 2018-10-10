@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.db import transaction, IntegrityError
+from django.db import transaction, close_old_connections
 from django.shortcuts import get_object_or_404, render
 import datetime
 from django.utils import timezone
@@ -18,7 +18,7 @@ from requests.exceptions import HTTPError
 
 from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place, Notification
 
-
+close_old_connections()
 # Basic arguments. You should extend this function with the push features you
 # want to use, or simply pass in a `PushMessage` object.
 def send_push_message(token, message, extra=None):
