@@ -46,6 +46,7 @@ ALLOWED_HOSTS = ['joinmeapi-dev.herokuapp.com', '127.0.0.1', 'joinmeapi.herokuap
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.postgres',
@@ -119,8 +120,17 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 }
 
 WSGI_APPLICATION = 'joinMeApi.wsgi.application'
+ASGI_APPLICATION = "joinMeApi.routing.application"
 
-
+#Channels config
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
