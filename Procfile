@@ -1,1 +1,1 @@
-web: gunicorn joinMeApi.wsgi --log-file -
+web: daphne joinMeApi.asgi:application --port $PORT --bind 0.0.0.0
