@@ -169,6 +169,7 @@ class Users(APIView):
                         'first_name': user.first_name,
                         'last_name': user.last_name,
                         'avatar': user.avatars.last().url if user.avatars and user.avatars.last() else '',
+                        'is_friend': True if user.friendship_creator.filter(friend=me, state=1).first() or user.friendship_friend.filter(creator=me, state=1).first() else False
                     }
                     ctx['users'].append(new_user)
 
