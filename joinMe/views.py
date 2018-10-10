@@ -155,7 +155,7 @@ class Users(APIView):
                 from django.db.models import Q
                 users = users.filter(Q(first_name__unaccent__icontains=search) | Q(last_name__unaccent__icontains=search))
 
-            if filtered == 'no-friends?':  # TODO: the ? is automatically added at the end of the url. Will have to debug that
+            if filtered == 'no-friends':  # TODO: the ? is automatically added at the end of the url. Will have to debug that
                 from django.db.models import Q
                 users = users.filter(~Q(Q(friendship_creator__friend=me, friendship_creator__state=1) |
                                         Q(friendship_friend__creator=me, friendship_friend__state=1)))
