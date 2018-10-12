@@ -1,6 +1,7 @@
 from channels.generic.websocket import WebsocketConsumer
 import json
 
+
 class EventConsumer(WebsocketConsumer):
     def connect(self):
         self.accept()
@@ -15,3 +16,4 @@ class EventConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': message
         }))
+
