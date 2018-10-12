@@ -122,12 +122,16 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
 WSGI_APPLICATION = 'joinMeApi.wsgi.application'
 ASGI_APPLICATION = "joinMeApi.routing.application"
 
+REDIS_URL_ARRAY = os.environ.get('REDIS_URL', 'redis://localhost:6379').rsplit(':',1)
+REDIS_HOST = REDIS_URL_ARRAY[0]
+REDIS_PORT = REDIS_URL_ARRAY[1]
+
 #Channels config
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [[os.environ.get('REDIS_URL', 'redis://localhost:6379')]],
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
         },
     },
 }
