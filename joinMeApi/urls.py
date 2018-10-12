@@ -18,6 +18,10 @@ from django.urls import path, path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.db import close_old_connections
+
+close_old_connections()
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('joinMe.urls')),
