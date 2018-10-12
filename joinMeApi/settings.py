@@ -142,6 +142,7 @@ DATABASES = {
         'PASSWORD': '@da/07/jb@',
         'HOST': 'localhost',
         'PORT': '',
+        'CONN_MAX_AGE': 500
     }
 }
 
