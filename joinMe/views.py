@@ -18,6 +18,9 @@ from requests.exceptions import HTTPError
 
 from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place, Notification
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 close_old_connections()
 # Basic arguments. You should extend this function with the push features you
 # want to use, or simply pass in a `PushMessage` object.
@@ -404,6 +407,14 @@ class EventDetails(APIView):
                 if g:
                     g.state = data['coming']
                     g.save()
+
+                    channel_layer = get_channel_layer()
+                    event_group_name = 'event_%s' % event_id
+                    async_to_sync(channel_layer.group_send)(event_group_name, {
+                        "type": "status.change",
+                        "guest_id": user.pk,
+                        "new_status": data['coming']
+                    })
 
                     for guest in guestsToEvent:
                         f_user = guest.guest
