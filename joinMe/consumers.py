@@ -33,3 +33,12 @@ class EventConsumer(WebsocketConsumer):
             'new_status': new_status
         }))
 
+    def guests_change(self, event):
+        action = event['action']
+        guest = event['guest']
+
+        self.send(text_data=json.dumps({
+            'type': 'guest_'+action,
+            'guest': guest
+        }))
+

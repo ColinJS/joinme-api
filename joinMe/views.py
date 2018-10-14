@@ -501,16 +501,26 @@ class SharingEvent(APIView):
 
             if event.created_by == user or event.guests.filter(guest_id=user.pk).first():
 
-                print('We get the event and we can add friends')
-                print(request.data['friends'])
-
                 for f in request.data['friends']:
                     f_user = User.objects.filter(pk=f['id']).first()
-                    print(f_user)
                     if f_user and f_user != event.created_by:
                         sharing = GuestToEvent(guest=f_user, event=event, state=0)
                         sharing.save()
-                        print(sharing)
+
+                        channel_layer = get_channel_layer()
+                        event_group_name = 'event_%s' % event_id
+                        async_to_sync(channel_layer.group_send)(event_group_name, {
+                            "type": "guests.change",
+                            "action": "add",
+                            "guest": {
+                                "id": f_user.pk,
+                                "first_name": f_user.first_name,
+                                "last_name": f_user.last_name,
+                                "avatar": f_user.avatars.last().url if f_user.avatars and f_user.avatars.last() else '',
+                                "state": 0,
+                            },
+                        })
+
                         notification = Notification(user=f_user, event=event, type_of_notification=0)
                         notification.save()
                         if f_user.profile.notification_key != "":
