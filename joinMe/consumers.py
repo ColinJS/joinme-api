@@ -13,7 +13,7 @@ class EventConsumer(WebsocketConsumer):
         self.accept()
 
     def disconnect(self, close_code):
-        async_to_sync(self.channel_layer.group_discard)("chat", self.channel_name)
+        async_to_sync(self.channel_layer.group_discard)(self.event_group_name, self.channel_name)
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -42,3 +42,28 @@ class EventConsumer(WebsocketConsumer):
             'guest': guest
         }))
 
+
+class UserConsumer(WebsocketConsumer):
+
+    def connect(self):
+        self.user = self.scope['user']
+        self.user_group_name = 'user_%s' % self.user.pk
+
+        async_to_sync(self.channel_layer.group_add)(self.event_group_name, self.channel_name)
+
+        self.send(text_data=json.dumps({
+            'message': self.user.first_name
+        }))
+
+        self.accept()
+
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+
+        self.send(text_data=json.dumps({
+            'message': self.user.first_name
+        }))
+
+    def disconnect(self, close_code):
+        async_to_sync(self.channel_layer.group_discard)(self.user_group_name, self.channel_name)
