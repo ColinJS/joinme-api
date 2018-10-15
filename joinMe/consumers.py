@@ -49,7 +49,7 @@ class UserConsumer(WebsocketConsumer):
         self.user = self.scope['user']
         self.user_group_name = 'user_%s' % self.user.pk
 
-        async_to_sync(self.channel_layer.group_add)(self.event_group_name, self.channel_name)
+        async_to_sync(self.channel_layer.group_add)(self.user_group_name, self.channel_name)
 
         self.send(text_data=json.dumps({
             'message': self.user.first_name
