@@ -1,16 +1,33 @@
 from channels.generic.websocket import WebsocketConsumer
 import json
 from asgiref.sync import async_to_sync
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import AnonymousUser
+from django.db import close_old_connections
+
+
+def userByToken(token):
+    user_token = Token.objects.filter(token=token).first()
+    close_old_connections()
+    if user_token:
+        user = user_token.user
+        return user
+    else:
+        return AnonymousUser()
 
 
 class EventConsumer(WebsocketConsumer):
     def connect(self):
         self.event_id = self.scope['url_route']['kwargs']['event_id']
         self.event_group_name = 'event_%s' % self.event_id
+        self.user = userByToken(self.scope['url_route']['kwarg']['token'])
+        if self.user and self.user != AnonymousUser:
+            async_to_sync(self.channel_layer.group_add)(self.event_group_name, self.channel_name)
 
-        async_to_sync(self.channel_layer.group_add)(self.event_group_name, self.channel_name)
-
-        self.accept()
+            self.accept()
+        else:
+            self.accept()
+            self.close()
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(self.event_group_name, self.channel_name)
@@ -46,23 +63,27 @@ class EventConsumer(WebsocketConsumer):
 class UserConsumer(WebsocketConsumer):
 
     def connect(self):
-        self.user = self.scope['user']
-        self.user_group_name = 'user_%s' % self.user.pk
+        self.user = userByToken(self.scope['url_route']['kwarg']['token'])
+        if self.user and self.user != AnonymousUser:
+            self.user_group_name = 'user_%s' % self.user.pk
 
-        async_to_sync(self.channel_layer.group_add)(self.user_group_name, self.channel_name)
+            async_to_sync(self.channel_layer.group_add)(self.user_group_name, self.channel_name)
 
-        self.send(text_data=json.dumps({
-            'message': self.user.first_name
-        }))
+            self.send(text_data=json.dumps({
+                'message': self.user.first_name
+            }))
 
-        self.accept()
+            self.accept()
+        else:
+            self.accept()
+            self.close()
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
 
         self.send(text_data=json.dumps({
-            'message': self.user.first_name
+            'first_name': self.user.first_name,
+            'message': text_data
         }))
 
     def disconnect(self, close_code):
