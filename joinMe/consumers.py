@@ -20,7 +20,7 @@ class EventConsumer(WebsocketConsumer):
     def connect(self):
         self.event_id = self.scope['url_route']['kwargs']['event_id']
         self.event_group_name = 'event_%s' % self.event_id
-        self.user = userByToken(self.scope['url_route']['kwarg']['token'])
+        self.user = userByToken(self.scope['url_route']['kwargs']['token'])
         if self.user and self.user != AnonymousUser:
             async_to_sync(self.channel_layer.group_add)(self.event_group_name, self.channel_name)
 
@@ -63,7 +63,7 @@ class EventConsumer(WebsocketConsumer):
 class UserConsumer(WebsocketConsumer):
 
     def connect(self):
-        self.user = userByToken(self.scope['url_route']['kwarg']['token'])
+        self.user = userByToken(self.scope['url_route']['kwargs']['token'])
         if self.user and self.user != AnonymousUser:
             self.user_group_name = 'user_%s' % self.user.pk
 
