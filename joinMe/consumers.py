@@ -19,9 +19,13 @@ def userByToken(token):
 
 class EventConsumer(WebsocketConsumer):
     def connect(self):
+
         self.event_id = self.scope['url_route']['kwargs']['event_id']
         self.event_group_name = 'event_%s' % self.event_id
         self.user = userByToken(self.scope['url_route']['kwargs']['token'])
+
+        print('websocket: ')
+        print(self.user.first_name)
         if self.user and self.user != AnonymousUser:
             async_to_sync(self.channel_layer.group_add)(self.event_group_name, self.channel_name)
 
