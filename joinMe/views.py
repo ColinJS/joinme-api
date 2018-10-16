@@ -22,6 +22,11 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
 close_old_connections()
+
+
+def time_stamp(time):
+    return int(time.mktime(time.timetuple()) * 1000)
+
 # Basic arguments. You should extend this function with the push features you
 # want to use, or simply pass in a `PushMessage` object.
 def send_push_message(token, message, extra=None, expiration=10800):
@@ -430,7 +435,7 @@ class EventDetails(APIView):
                             notification = Notification(user=f_user, event=g.event, type_of_notification=1)
                             notification.save()
                             if f_user.profile.notification_key != "":
-                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), expiration=g.event.ending_time)
+                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), expiration=time_stamp(g.event.ending_time))
 
                     if user != g.event.created_by and data['coming'] == 1:
                         print("send notif to %s" % g.event.created_by.first_name)
@@ -442,7 +447,7 @@ class EventDetails(APIView):
                         })
                         notification = Notification(user=g.event.created_by, event=g.event, type_of_notification=1)
                         notification.save()
-                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, expiration=g.event.ending_time)
+                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, expiration=time_stamp(g.event.ending_time))
 
                     return Response({'message': 'Update your state to the event is done'})
 
