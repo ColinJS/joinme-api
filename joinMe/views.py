@@ -24,8 +24,8 @@ from asgiref.sync import async_to_sync
 close_old_connections()
 
 
-def time_stamp(time):
-    return int(time.mktime(time.timetuple()) * 1000)
+def time_stamp(myTime):
+    return int(time.mktime(myTime.timetuple()) * 1000)
 
 # Basic arguments. You should extend this function with the push features you
 # want to use, or simply pass in a `PushMessage` object.
