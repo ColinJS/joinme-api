@@ -27,6 +27,7 @@ class EventConsumer(WebsocketConsumer):
         print('websocket: ')
         print(self.user.first_name)
         if self.user and self.user != AnonymousUser:
+            print('valid authentication: ')
             async_to_sync(self.channel_layer.group_add)(self.event_group_name, self.channel_name)
 
             self.accept()
