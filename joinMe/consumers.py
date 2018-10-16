@@ -1,13 +1,13 @@
 from channels.generic.websocket import WebsocketConsumer
 import json
 from asgiref.sync import async_to_sync
-from rest_framework.authtoken.models import Token
+from oauth2_provider.models import AccessToken
 from django.contrib.auth.models import AnonymousUser
 from django.db import close_old_connections
 
 
 def userByToken(token):
-    user_token = Token.objects.filter(token=token).first()
+    user_token = AccessToken.objects.filter(token=token).first()
     close_old_connections()
     if user_token:
         user = user_token.user
