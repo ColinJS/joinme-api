@@ -69,11 +69,13 @@ class UserConsumer(WebsocketConsumer):
 
             async_to_sync(self.channel_layer.group_add)(self.user_group_name, self.channel_name)
 
+            self.accept()
+
             self.send(text_data=json.dumps({
                 'message': self.user.first_name
             }))
 
-            self.accept()
+
         else:
             self.accept()
             self.close()
