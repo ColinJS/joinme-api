@@ -420,6 +420,12 @@ class EventDetails(APIView):
                         f_user = guest.guest
                         if g.event.created_by != f_user and f_user != user and data['coming'] == 1:
                             print("send notif to %s" % f_user.first_name)
+                            user_group_name = 'user %s' % f_user.pk
+                            async_to_sync(channel_layer.group_send)(user_group_name, {
+                                "type": "notifs.change",
+                                "action": "add",
+                                "quantity": 1
+                            })
                             notification = Notification(user=f_user, event=g.event, type_of_notification=1)
                             notification.save()
                             if f_user.profile.notification_key != "":
@@ -427,6 +433,12 @@ class EventDetails(APIView):
 
                     if user != g.event.created_by and data['coming'] == 1:
                         print("send notif to %s" % g.event.created_by.first_name)
+                        user_group_name = 'user %s' % g.event.created_by.pk
+                        async_to_sync(channel_layer.group_send)(user_group_name, {
+                            "type": "notifs.change",
+                            "action": "add",
+                            "quantity": 1
+                        })
                         notification = Notification(user=g.event.created_by, event=g.event, type_of_notification=1)
                         notification.save()
                         send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name)
@@ -519,6 +531,13 @@ class SharingEvent(APIView):
                                 "avatar": f_user.avatars.last().url if f_user.avatars and f_user.avatars.last() else '',
                                 "state": 0,
                             },
+                        })
+
+                        user_group_name = 'user %s' % f_user.pk
+                        async_to_sync(channel_layer.group_send)(user_group_name,{
+                            "type": "notifs.change",
+                            "action": "add",
+                            "quantity": 1
                         })
 
                         notification = Notification(user=f_user, event=event, type_of_notification=0)

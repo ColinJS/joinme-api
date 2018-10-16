@@ -4,6 +4,7 @@ from asgiref.sync import async_to_sync
 from oauth2_provider.models import AccessToken
 from django.contrib.auth.models import AnonymousUser
 from django.db import close_old_connections
+from joinMe.models import Notification
 
 
 def userByToken(token):
@@ -34,11 +35,17 @@ class EventConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        action = text_data_json['action']
+        if action == 'delete_notifs':
+            event_notifs = Notification.objects.filter(event__pk=self.event_id, user__pk=self.user.pk)
+            notifs_len = len(event_notifs)
+            event_notifs.delete()
 
-        self.send(text_data=json.dumps({
-            'message': message
-        }))
+            async_to_sync(self.channel_layer.group_send)('user_'+self.user.pk, {
+                'type': 'notifs_change',
+                'action': 'delete',
+                'quantity': notifs_len,
+            })
 
     def status_change(self, event):
         guest_id = event['guest_id']
@@ -71,11 +78,6 @@ class UserConsumer(WebsocketConsumer):
 
             self.accept()
 
-            self.send(text_data=json.dumps({
-                'message': self.user.first_name
-            }))
-
-
         else:
             self.accept()
             self.close()
@@ -90,3 +92,11 @@ class UserConsumer(WebsocketConsumer):
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(self.user_group_name, self.channel_name)
+
+    def notifs_change(self, event):
+        action = event['action']
+        number = event['quantity']
+        self.send(text_data=json.dumps({
+            'type': 'notifs_'+action,
+            'quantity': number
+        }))
