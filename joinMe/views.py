@@ -221,7 +221,7 @@ class EventList(APIView):
                         for f_user in users:
                             if f_user != user and f_user.pk != 1:
                                 if f_user.profile.notification_key != "":
-                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), expiration=event.ending_time)
+                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), {'screen': 'event', 'event_id': event.pk}, time_stamp(event.ending_time))
                                 notification = Notification(user=f_user, event=event, type_of_notification=0)
                                 notification.save()
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
@@ -232,7 +232,7 @@ class EventList(APIView):
                             f_user = User.objects.filter(pk=f['id']).first()
                             if f_user:
                                 if f_user.profile.notification_key != "":
-                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), expiration=event.ending_time)
+                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), {'screen': 'event', 'event_id': event.pk}, time_stamp(event.ending_time))
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
                                 notification = Notification(user=f_user, event=event, type_of_notification=0)
@@ -435,7 +435,7 @@ class EventDetails(APIView):
                             notification = Notification(user=f_user, event=g.event, type_of_notification=1)
                             notification.save()
                             if f_user.profile.notification_key != "":
-                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), expiration=time_stamp(g.event.ending_time))
+                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time))
 
                     if user != g.event.created_by and data['coming'] == 1:
                         print("send notif to %s" % g.event.created_by.first_name)
@@ -447,7 +447,7 @@ class EventDetails(APIView):
                         })
                         notification = Notification(user=g.event.created_by, event=g.event, type_of_notification=1)
                         notification.save()
-                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, expiration=time_stamp(g.event.ending_time))
+                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time))
 
                     return Response({'message': 'Update your state to the event is done'})
 
