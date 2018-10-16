@@ -420,7 +420,7 @@ class EventDetails(APIView):
                         f_user = guest.guest
                         if g.event.created_by != f_user and f_user != user and data['coming'] == 1:
                             print("send notif to %s" % f_user.first_name)
-                            user_group_name = 'user %s' % f_user.pk
+                            user_group_name = 'user_%s' % f_user.pk
                             async_to_sync(channel_layer.group_send)(user_group_name, {
                                 "type": "notifs.change",
                                 "action": "add",
@@ -433,7 +433,7 @@ class EventDetails(APIView):
 
                     if user != g.event.created_by and data['coming'] == 1:
                         print("send notif to %s" % g.event.created_by.first_name)
-                        user_group_name = 'user %s' % g.event.created_by.pk
+                        user_group_name = 'user_%s' % g.event.created_by.pk
                         async_to_sync(channel_layer.group_send)(user_group_name, {
                             "type": "notifs.change",
                             "action": "add",
@@ -533,8 +533,8 @@ class SharingEvent(APIView):
                             },
                         })
 
-                        user_group_name = 'user %s' % f_user.pk
-                        async_to_sync(channel_layer.group_send)(user_group_name,{
+                        user_group_name = 'user_%s' % f_user.pk
+                        async_to_sync(channel_layer.group_send)(user_group_name, {
                             "type": "notifs.change",
                             "action": "add",
                             "quantity": 1

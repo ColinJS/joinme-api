@@ -41,7 +41,7 @@ class EventConsumer(WebsocketConsumer):
             notifs_len = len(event_notifs)
             event_notifs.delete()
 
-            async_to_sync(self.channel_layer.group_send)('user_'+self.user.pk, {
+            async_to_sync(self.channel_layer.group_send)('user_%s' % self.user.pk, {
                 'type': 'notifs_change',
                 'action': 'delete',
                 'quantity': notifs_len,
