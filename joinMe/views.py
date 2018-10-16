@@ -24,12 +24,13 @@ from asgiref.sync import async_to_sync
 close_old_connections()
 # Basic arguments. You should extend this function with the push features you
 # want to use, or simply pass in a `PushMessage` object.
-def send_push_message(token, message, extra=None):
+def send_push_message(token, message, extra=None, expiration=10800):
     try:
         response = PushClient().publish(
             PushMessage(to=token,
                         body=message,
-                        data=extra))
+                        data=extra,
+                        expiration=expiration))
     except PushServerError as exc:
         pass
     except (ConnectionError, HTTPError) as exc:
@@ -215,7 +216,7 @@ class EventList(APIView):
                         for f_user in users:
                             if f_user != user and f_user.pk != 1:
                                 if f_user.profile.notification_key != "":
-                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name))
+                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), expiration=event.ending_time)
                                 notification = Notification(user=f_user, event=event, type_of_notification=0)
                                 notification.save()
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
@@ -226,7 +227,7 @@ class EventList(APIView):
                             f_user = User.objects.filter(pk=f['id']).first()
                             if f_user:
                                 if f_user.profile.notification_key != "":
-                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name))
+                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), expiration=event.ending_time)
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
                                 notification = Notification(user=f_user, event=event, type_of_notification=0)
@@ -429,7 +430,7 @@ class EventDetails(APIView):
                             notification = Notification(user=f_user, event=g.event, type_of_notification=1)
                             notification.save()
                             if f_user.profile.notification_key != "":
-                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name))
+                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), expiration=GuestToEvent.event.ending_time)
 
                     if user != g.event.created_by and data['coming'] == 1:
                         print("send notif to %s" % g.event.created_by.first_name)
@@ -441,7 +442,7 @@ class EventDetails(APIView):
                         })
                         notification = Notification(user=g.event.created_by, event=g.event, type_of_notification=1)
                         notification.save()
-                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name)
+                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, expiration=GuestToEvent.event.ending_time)
 
                     return Response({'message': 'Update your state to the event is done'})
 
