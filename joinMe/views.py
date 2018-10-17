@@ -222,6 +222,13 @@ class EventList(APIView):
                             if f_user != user and f_user.pk != 1:
                                 if f_user.profile.notification_key != "":
                                     send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), {'screen': 'event', 'event_id': event.pk}, time_stamp(event.ending_time))
+                                channel_layer = get_channel_layer()
+                                user_group_name = 'user_%s' % f_user.pk
+                                async_to_sync(channel_layer.group_send)(user_group_name, {
+                                    "type": "notifs.change",
+                                    "action": "add",
+                                    "quantity": 1
+                                })
                                 notification = Notification(user=f_user, event=event, type_of_notification=0)
                                 notification.save()
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
@@ -233,6 +240,13 @@ class EventList(APIView):
                             if f_user:
                                 if f_user.profile.notification_key != "":
                                     send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), {'screen': 'event', 'event_id': event.pk}, time_stamp(event.ending_time))
+                                channel_layer = get_channel_layer()
+                                user_group_name = 'user_%s' % f_user.pk
+                                async_to_sync(channel_layer.group_send)(user_group_name, {
+                                    "type": "notifs.change",
+                                    "action": "add",
+                                    "quantity": 1
+                                })
                                 sharing = GuestToEvent(guest=f_user, event=event, state=0)
                                 sharing.save()
                                 notification = Notification(user=f_user, event=event, type_of_notification=0)
