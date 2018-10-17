@@ -34,9 +34,7 @@ def send_push_message(token, message, extra=None, expiration=10800, badge=0):
         response = PushClient().publish(
             PushMessage(to=token,
                         body=message,
-                        data=extra,
-                        expiration=expiration,
-                        badge=badge))
+                        data=extra))
     except PushServerError as exc:
         pass
     except (ConnectionError, HTTPError) as exc:
