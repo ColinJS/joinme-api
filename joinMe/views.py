@@ -29,13 +29,14 @@ def time_stamp(myTime):
 
 # Basic arguments. You should extend this function with the push features you
 # want to use, or simply pass in a `PushMessage` object.
-def send_push_message(token, message, extra=None, expiration=10800):
+def send_push_message(token, message, extra=None, expiration=10800, badge=0):
     try:
         response = PushClient().publish(
             PushMessage(to=token,
                         body=message,
                         data=extra,
-                        expiration=expiration))
+                        expiration=expiration,
+                        badge=badge))
     except PushServerError as exc:
         pass
     except (ConnectionError, HTTPError) as exc:
@@ -221,7 +222,8 @@ class EventList(APIView):
                         for f_user in users:
                             if f_user != user and f_user.pk != 1:
                                 if f_user.profile.notification_key != "":
-                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), {'screen': 'event', 'event_id': event.pk}, time_stamp(event.ending_time))
+                                    badge = len(f_user.notifications.filter(state=0))
+                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), {'screen': 'event', 'event_id': event.pk}, time_stamp(event.ending_time), badge)
                                 channel_layer = get_channel_layer()
                                 user_group_name = 'user_%s' % f_user.pk
                                 async_to_sync(channel_layer.group_send)(user_group_name, {
@@ -239,7 +241,8 @@ class EventList(APIView):
                             f_user = User.objects.filter(pk=f['id']).first()
                             if f_user:
                                 if f_user.profile.notification_key != "":
-                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), {'screen': 'event', 'event_id': event.pk}, time_stamp(event.ending_time))
+                                    badge = len(f_user.notifications.filter(state=0))
+                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), {'screen': 'event', 'event_id': event.pk}, time_stamp(event.ending_time), badge)
                                 channel_layer = get_channel_layer()
                                 user_group_name = 'user_%s' % f_user.pk
                                 async_to_sync(channel_layer.group_send)(user_group_name, {
@@ -449,7 +452,8 @@ class EventDetails(APIView):
                             notification = Notification(user=f_user, event=g.event, type_of_notification=1)
                             notification.save()
                             if f_user.profile.notification_key != "":
-                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time))
+                                badge = len(f_user.notifications.filter(state=0))
+                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time), badge)
 
                     if user != g.event.created_by and data['coming'] == 1:
                         print("send notif to %s" % g.event.created_by.first_name)
@@ -461,7 +465,8 @@ class EventDetails(APIView):
                         })
                         notification = Notification(user=g.event.created_by, event=g.event, type_of_notification=1)
                         notification.save()
-                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time))
+                        badge = len(g.event.created_by.notifications.filter(state=0))
+                        send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time), badge)
 
                     return Response({'message': 'Update your state to the event is done'})
 
