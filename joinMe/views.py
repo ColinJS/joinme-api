@@ -548,8 +548,6 @@ class FriendshipManager(APIView):
                 friendship.save()
 
 
-
-
 class SharingEvent(APIView):
 
     def put(self, request, event_id):
