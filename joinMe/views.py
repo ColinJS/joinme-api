@@ -547,6 +547,8 @@ class FriendshipManager(APIView):
                 friendship.state = 2
                 friendship.save()
 
+            return Response({"message": "Done"})
+
 
 class SharingEvent(APIView):
 
