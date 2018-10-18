@@ -530,6 +530,26 @@ class FriendList(APIView):
         return Response({"error": "You're not authentified"})
 
 
+class FriendshipManager(APIView):
+
+    def put(self, request, user_id):
+
+        if request.auth:
+            user = request.user
+            data = request.data
+            from django.db.models import Q
+            friendship = get_object_or_404(Friendship, Q(creator__pk=user.pk, friend__pk=user_id) | Q(creator__pk=user_id, friend__pk=user.pk))
+
+            if data['action'] == 'refuse':
+                friendship.delete()
+
+            elif data['action'] == 'block':
+                friendship.state = 2
+                friendship.save()
+
+
+
+
 class SharingEvent(APIView):
 
     def put(self, request, event_id):
