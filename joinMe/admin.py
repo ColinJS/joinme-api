@@ -12,13 +12,15 @@ class GuestsInline(admin.TabularInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    readonly_fields = ['created_by', 'duration', 'created', 'video_url']
+    readonly_fields = ['created_by', 'duration', 'created', 'video_view']
     inlines = [GuestsInline, ]
     search_fields = ['created_by__first_name', 'created_by__last_name', 'created_by__pk']
 
-    def video_url(self, event):
+    def video_view(self, event):
         url = event.videos.last().video
         return mark_safe("<video controls><source src='{}' type='video/mp4'></video>".format(url))
+
+    list_display = ['video_view', ]
 
 
 admin.site.register(Video)
