@@ -55,3 +55,11 @@ class Notification(models.Model):
     type_of_notification = models.SmallIntegerField(choices=((0, "NEW_INVITATION"), (1, "SOMEONE_COMING")), default=0)
     state = models.SmallIntegerField(choices=((0, "UNSEEN"), (1, "SEEN")), default=0)
     created = models.DateTimeField(auto_now_add=True)
+
+
+#class UserGroup(models.Model):
+#    created_by = models.ForeignKey(User, related_name='my_groups', on_delete=models.DO_NOTHING)
+#    users = models.ManyToManyField(User, related_name='groups', on_delete=models.DO_NOTHING)
+#    created = models.DateTimeField(auto_now_add=True)
+#    name = models.CharField(max_length=200, blank=False)
+

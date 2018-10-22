@@ -1,3 +1,5 @@
 from django.contrib import admin
+from joinMe.models import Profile, Avatar, Event, GuestToEvent, Notification
 
-# Register your models here.
+admin.site.register(Event)
+
