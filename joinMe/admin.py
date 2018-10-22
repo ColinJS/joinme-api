@@ -11,7 +11,8 @@ class GuestsInline(admin.TabularInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    fields = ['created_by', 'duration', 'created', 'video_url']
+    fields = ['created_by', 'duration',  'video_url']
+    readonly_fields = ['created',]
     inlines = [GuestsInline, ]
 
     def video_url(self, event):
