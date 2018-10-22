@@ -17,7 +17,7 @@ class EventAdmin(admin.ModelAdmin):
 
     def video_url(self, event):
         url = event.videos.last().video
-        return mark_safe("<a href='{}'>{}</a>".format(url, url))
+        return mark_safe("<video controls><source src='{}' type='video/mp4'></video>".format(url))
 
 
 admin.site.register(Video)
