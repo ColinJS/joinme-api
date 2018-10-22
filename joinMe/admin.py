@@ -16,6 +16,8 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [GuestsInline, ]
 
     def video_url(self, event):
+        print('event :')
+        print(event)
         url = event.videos.video
         return mark_safe("<a href='{}'>{}</a>".format(url, url))
 
