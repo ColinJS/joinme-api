@@ -24,7 +24,7 @@ class EventAdmin(admin.ModelAdmin):
         url = event.videos.last().video
         return mark_safe("<video height='200' controls><source src='{}' type='video/mp4'></video>".format(url))
 
-    list_display = ['created_by', 'video_view_little', ]
+    list_display = ['created_by', 'created', 'video_view_little', ]
 
 
 admin.site.register(Video)
