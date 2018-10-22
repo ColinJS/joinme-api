@@ -8,10 +8,10 @@ class GuestsInline(admin.TabularInline):
         (None, {'fields': ['guest', 'state']})
     ]
     ordering = ('state',)
+    extra = 0
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    fields = []
     readonly_fields = ['created_by', 'duration', 'created', 'video_url']
     inlines = [GuestsInline, ]
 

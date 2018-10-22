@@ -22,6 +22,9 @@ class Event(models.Model):
     duration = models.DurationField(blank=True, default=datetime.timedelta(hours=3))
     ending_time = models.DateTimeField(default=timezone.now()+datetime.timedelta(hours=3))
 
+    def __str__(self):
+        return "%s %s" % (self.created_by.first_name, self.created_by.last_name)
+
 
 class Video(models.Model):
     created = models.DateTimeField(auto_now_add=True)
