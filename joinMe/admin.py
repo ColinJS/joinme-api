@@ -1,9 +1,15 @@
 from django.contrib import admin
 from joinMe.models import Profile, Avatar, Event, GuestToEvent, Notification, Video, Place
 
+class GuestsInline(admin.TabularInline):
+    model = GuestToEvent
+    fieldsets = [
+        (None, {'fields': ['guest', 'state']})
+    ]
+
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    fields = ('created_by', 'duration', 'videos', 'guests', 'place')
+    inlines = [GuestsInline, ]
 
 
 admin.site.register(Video)
