@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from django.db import transaction, close_old_connections
@@ -188,6 +189,7 @@ class Users(APIView):
 class UserGroupEndPoint(viewsets.ModelViewSet):
 
     serializer_class = UserGroupSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         if self.request.auth:
