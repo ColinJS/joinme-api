@@ -1,7 +1,13 @@
 from rest_framework import serializers
-from joinMe.models import Friendship, Profile, Avatar, Event, Video
+from joinMe.models import Friendship, Profile, Avatar, Event, Video, UserGroup
 from django.contrib.auth.models import User
 
+
+class UserGroupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserGroup
+        fields = ['name', 'users']
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

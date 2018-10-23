@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework.response import Response
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from django.db import transaction, close_old_connections
 from django.shortcuts import get_object_or_404, render
@@ -16,7 +17,8 @@ from exponent_server_sdk import PushServerError
 from requests.exceptions import ConnectionError
 from requests.exceptions import HTTPError
 
-from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place, Notification
+from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place, Notification, UserGroup
+from joinMe.serializers import UserGroupSerializer
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -181,6 +183,19 @@ class Users(APIView):
                     ctx['users'].append(new_user)
 
             return Response(ctx)
+
+
+class UserGroupEndPoint(viewsets.ModelViewSet):
+
+    serializer_class = UserGroupSerializer
+
+    def get_queryset(self):
+        if self.request.auth:
+            return self.request.user.groups
+
+    def perform_create(self, serializer):
+        if self.request.auth:
+            serializer.save(created_by=self.request.user)
 
 
 class EventList(APIView):

@@ -60,9 +60,9 @@ class Notification(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
 
-#class UserGroup(models.Model):
-#    created_by = models.ForeignKey(User, related_name='my_groups', on_delete=models.DO_NOTHING)
-#    users = models.ManyToManyField(User, related_name='groups', on_delete=models.DO_NOTHING)
-#    created = models.DateTimeField(auto_now_add=True)
-#    name = models.CharField(max_length=200, blank=False)
+class UserGroup(models.Model):
+    created_by = models.ForeignKey(User, related_name='my_friends_groups', on_delete=models.DO_NOTHING)
+    users = models.ManyToManyField(User, related_name='friends_groups')
+    created = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=200, blank=False)
 
