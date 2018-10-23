@@ -3,7 +3,7 @@ from joinMe import views
 from rest_framework import routers
 
 url_router = routers.SimpleRouter()
-url_router.register(r'groups', views.UserGroupEndPoint)
+url_router.register(r'groups', views.UserGroupEndPoint, base_name='groups')
 
 urlpatterns = [
     url(r'^init$', views.FirstConnection.as_view()),
