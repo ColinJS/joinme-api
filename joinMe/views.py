@@ -196,7 +196,9 @@ class UserGroupEndPoint(viewsets.ModelViewSet):
         return user.friends_groups.all() | user.my_friends_groups.all()
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+        users = self.request.data.get('users', None)
+        users.append(self.request.user.pk)
+        serializer.save(created_by=self.request.user, users=users)
 
 
 class EventList(APIView):

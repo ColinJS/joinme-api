@@ -10,11 +10,6 @@ class UserGroupSerializer(serializers.ModelSerializer):
         fields = ['pk', 'name', 'users']
         read_only_fields = ['created_by']
 
-    def create(self, validated_data):
-        name = validated_data['name']
-        created_by = validated_data['created_by']
-        users = validated_data['users'].append(created_by.pk)
-        UserGroup.objects.create(name=name, created_by=created_by, users=users)
 
 
 
