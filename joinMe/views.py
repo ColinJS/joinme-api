@@ -196,7 +196,7 @@ class UserGroupEndPoint(viewsets.ModelViewSet):
             return self.request.user.groups
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user.pk)
+        serializer.save(created_by=self.request.user)
 
 
 class EventList(APIView):
