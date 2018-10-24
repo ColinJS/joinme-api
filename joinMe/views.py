@@ -196,6 +196,7 @@ class UserGroupEndPoint(viewsets.ModelViewSet):
             return self.request.user.groups
 
     def perform_create(self, serializer):
+        print(self.request.user.first_name)
         serializer.save(created_by=self.request.user)
 
 
