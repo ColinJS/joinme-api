@@ -193,7 +193,7 @@ class UserGroupEndPoint(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return user.groups | user.my_groups
+        return user.groups | user.my_friends_groups
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
