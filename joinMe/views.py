@@ -192,8 +192,8 @@ class UserGroupEndPoint(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        if self.request.auth:
-            return self.request.user.groups
+        user = self.request.user
+        return user.groups | user.my_groups
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
