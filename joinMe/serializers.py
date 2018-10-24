@@ -3,14 +3,20 @@ from joinMe.models import Friendship, Profile, Avatar, Event, Video, UserGroup
 from django.contrib.auth.models import User
 
 
+class SimpleUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'avatars')
+
+
 class UserGroupSerializer(serializers.ModelSerializer):
+
+    created_by = SimpleUserSerializer(read_only=True)
 
     class Meta:
         model = UserGroup
-        fields = ['id', 'name', 'users']
-        read_only_fields = ['created_by']
-
-
+        fields = ['id', 'name', 'users', 'created_by']
 
 
 class UserSerializer(serializers.ModelSerializer):
