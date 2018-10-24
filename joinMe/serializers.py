@@ -7,7 +7,7 @@ class UserGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserGroup
-        fields = ['pk', 'name', 'users']
+        fields = ['id', 'name', 'users']
         read_only_fields = ['created_by']
 
 
