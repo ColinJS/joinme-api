@@ -256,7 +256,7 @@ class EventList(APIView):
                     elif 'friends' in data:
                         for f in data['friends']:
                             f_user = User.objects.filter(pk=f['id']).first()
-                            if f_user:
+                            if f_user and f_user != user:
                                 if f_user.profile.notification_key != "":
                                     now = timezone.now()
                                     badge = len(f_user.notifications.filter(event__ending_time__gte=now, state=0))
