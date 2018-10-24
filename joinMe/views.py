@@ -193,7 +193,7 @@ class UserGroupEndPoint(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return user.friends_groups.all() | user.my_friends_groups.all()
+        return user.friends_groups.all()
 
     def perform_create(self, serializer):
         users = self.request.data.get('users', None)
