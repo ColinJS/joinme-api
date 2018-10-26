@@ -1,13 +1,25 @@
 from rest_framework import serializers
 from joinMe.models import Friendship, Profile, Avatar, Event, Video, UserGroup
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth import get_user_model
 
 
 class SimpleUserSerializer(serializers.ModelSerializer):
 
+    @property
+    def is_friend(self):
+        current_user = get_user_model()
+        if current_user != AnonymousUser:
+            from django.db.models import Q
+            return (len(Friendship.objects.filter(Q(creator__pk=current_user.pk, friend__pk=self.validated_data['id']) |
+                                                  Q(creator__pk=self.validated_data['id'], friend__pk=current_user.pk)).first()) > 0)
+        else:
+            return False
+
     class Meta:
         model = User
         fields = ('id', 'first_name', 'last_name', 'avatars')
+        read_only_fields = ['is_friend']
 
 
 class UserGroupSerializer(serializers.ModelSerializer):
