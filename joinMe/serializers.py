@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 class SimpleUserSerializer(serializers.ModelSerializer):
 
     is_friend = serializers.SerializerMethodField()
+    avatar = serializers.SerializerMethodField()
 
     def get_is_friend(self, user):
         current_user = self.context['request'].user
@@ -17,9 +18,12 @@ class SimpleUserSerializer(serializers.ModelSerializer):
         else:
             return False
 
+    def get_avatar(self, user):
+        return user.avatars.last().url  if user.avatars and user.avatars.last() else '',
+
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'avatars', 'is_friend')
+        fields = ('id', 'first_name', 'last_name', 'avatar', 'is_friend')
 
 
 class UserGroupSerializer(serializers.ModelSerializer):
