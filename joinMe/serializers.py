@@ -19,7 +19,8 @@ class SimpleUserSerializer(serializers.ModelSerializer):
             return False
 
     def get_avatar(self, user):
-        return (user.avatars.last().url[0] if user.avatars and user.avatars.last() else ''),
+        avatar = (user.avatars.last().url if user.avatars and user.avatars.last() else '')
+        return avatar
 
     class Meta:
         model = User
