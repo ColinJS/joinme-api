@@ -13,6 +13,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 class UserGroupSerializer(serializers.ModelSerializer):
 
     created_by = SimpleUserSerializer(read_only=True)
+    users = SimpleUserSerializer(read_only=True, many=True)
 
     class Meta:
         model = UserGroup
