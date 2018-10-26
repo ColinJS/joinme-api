@@ -18,8 +18,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'avatars')
-        read_only_fields = ['is_friend']
+        fields = ('id', 'first_name', 'last_name', 'avatars', 'is_friend')
 
 
 class UserGroupSerializer(serializers.ModelSerializer):
