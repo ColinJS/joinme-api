@@ -6,8 +6,9 @@ from django.contrib.auth import get_user_model
 
 class SimpleUserSerializer(serializers.ModelSerializer):
 
-    @property
-    def is_friend(self):
+    is_friend = serializers.SerializerMethodField()
+
+    def get_is_friend(self):
         current_user = get_user_model()
         if current_user != AnonymousUser:
             from django.db.models import Q
