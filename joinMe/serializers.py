@@ -10,12 +10,10 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
     def get_is_friend(self, user):
         current_user = self.context['request'].user
-        print(current_user)
-        print(user)
         if current_user != AnonymousUser:
             from django.db.models import Q
-            return (len(Friendship.objects.filter(Q(creator__pk=current_user.pk, friend__pk=user.id) |
-                                                  Q(creator__pk=user.id, friend__pk=current_user.pk)).first()) > 0)
+            return (Friendship.objects.filter(Q(creator__pk=current_user.pk, friend__pk=user.id) |
+                                              Q(creator__pk=user.id, friend__pk=current_user.pk)).first() is not None)
         else:
             return False
 
