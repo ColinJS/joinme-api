@@ -37,6 +37,15 @@ class UserGroupSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'users', 'created_by']
 
 
+class UserGroupListSerializer(serializers.ModelSerializer):
+
+    created_by = SimpleUserSerializer(read_only=True)
+
+    class Meta:
+        model = UserGroup
+        fields = ['id', 'name', 'users', 'created_by']
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

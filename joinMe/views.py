@@ -19,7 +19,7 @@ from requests.exceptions import ConnectionError
 from requests.exceptions import HTTPError
 
 from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place, Notification, UserGroup
-from joinMe.serializers import UserGroupSerializer
+from joinMe.serializers import UserGroupSerializer, UserGroupListSerializer
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -190,6 +190,13 @@ class UserGroupEndPoint(viewsets.ModelViewSet):
 
     serializer_class = UserGroupSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'update' or self.action == 'partial_update':
+            return UserGroupListSerializer
+        else:
+            return UserGroupSerializer
+
 
     def get_queryset(self):
         user = self.request.user
