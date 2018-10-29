@@ -61,11 +61,14 @@ class Notification(models.Model):
 
 
 class UserGroup(models.Model):
-
     created_by = models.ForeignKey(User, related_name='my_friends_groups', on_delete=models.DO_NOTHING)
     users = models.ManyToManyField(User, related_name='friends_groups')
     created = models.DateTimeField(auto_now_add=True)
     name = models.CharField(max_length=200, blank=False)
 
 
-
+class Comment(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, related_name='event_comments', on_delete=models.CASCADE)
+    event = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
+    comment = models.CharField(max_length=600, blank=False)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from joinMe.models import Friendship, Profile, Avatar, Event, Video, UserGroup
+from joinMe.models import Friendship, Profile, Avatar, Event, Video, UserGroup, Comment
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth import get_user_model
 
@@ -44,6 +44,16 @@ class UserGroupListSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserGroup
         fields = ['id', 'name', 'users', 'created_by']
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    created_by = SimpleUserSerializer(read_only=True, many=False)
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'created_by', 'event', 'comment']
+
 
 
 class UserSerializer(serializers.ModelSerializer):

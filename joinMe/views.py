@@ -18,8 +18,8 @@ from exponent_server_sdk import PushServerError
 from requests.exceptions import ConnectionError
 from requests.exceptions import HTTPError
 
-from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place, Notification, UserGroup
-from joinMe.serializers import UserGroupSerializer, UserGroupListSerializer
+from joinMe.models import Friendship, Profile, Avatar, Event, Video, GuestToEvent, Place, Notification, UserGroup, Comment
+from joinMe.serializers import UserGroupSerializer, UserGroupListSerializer, CommentSerializer
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -206,6 +206,18 @@ class UserGroupEndPoint(viewsets.ModelViewSet):
         users = self.request.data.get('users', None)
         users.append(self.request.user.pk)
         serializer.save(created_by=self.request.user, users=users)
+
+
+class CommentEndPoint(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.event_comments.all()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 
 class EventList(APIView):

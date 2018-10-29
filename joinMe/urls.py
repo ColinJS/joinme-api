@@ -4,6 +4,7 @@ from rest_framework import routers
 
 url_router = routers.SimpleRouter()
 url_router.register(r'groups', views.UserGroupEndPoint, base_name='groups')
+url_router.register(r'comments', views.CommentEndPoint,  base_name='comments')
 
 urlpatterns = [
     url(r'^init$', views.FirstConnection.as_view()),
