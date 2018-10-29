@@ -437,7 +437,7 @@ class EventDetails(APIView):
                     'state': guest.state,
                     'avatar': guest.guest.avatars.last().url if guest.guest.avatars.last() else "",
                     'id': guest.guest.pk,
-                    'comment': (comments.filter(created_by=guest.guest).first().message if comments.filter(created_by=guest.guest).first() else ''),
+                    'comment': (comments.filter(created_by=guest.guest).last().message if comments.filter(created_by=guest.guest).first() else ''),
                 }
                 if new_guest not in ctx['guests']:
                     ctx['guests'].append(new_guest)
