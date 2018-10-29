@@ -400,6 +400,7 @@ class EventDetails(APIView):
             event = get_object_or_404(Event, pk=event_id)
             guests = event.guests.all()
             notifications = user.notifications.filter(event=event)
+            comments = Comment.objects.filter(event=event)
             video_url = event.videos.last().video
             thumb_url_splitted = video_url.rsplit('/', 1)
             thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
@@ -436,9 +437,12 @@ class EventDetails(APIView):
                     'state': guest.state,
                     'avatar': guest.guest.avatars.last().url if guest.guest.avatars.last() else "",
                     'id': guest.guest.pk,
+                    'comment': (comments.filter(created_by=guest).first() if comments.filter(created_by=guest).first() else ''),
                 }
                 if new_guest not in ctx['guests']:
                     ctx['guests'].append(new_guest)
+
+
 
             return Response(ctx)
 

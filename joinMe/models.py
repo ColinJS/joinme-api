@@ -71,4 +71,4 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='event_comments', on_delete=models.CASCADE)
     event = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
-    comment = models.CharField(max_length=600, blank=False)
+    message = models.CharField(max_length=600, blank=False)
