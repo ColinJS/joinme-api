@@ -442,8 +442,6 @@ class EventDetails(APIView):
                 if new_guest not in ctx['guests']:
                     ctx['guests'].append(new_guest)
 
-
-
             return Response(ctx)
 
         return Response({'response': request.auth})
