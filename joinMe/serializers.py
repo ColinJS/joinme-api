@@ -3,6 +3,9 @@ from joinMe.models import Friendship, Profile, Avatar, Event, Video, UserGroup, 
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth import get_user_model
 
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 
 class SimpleUserSerializer(serializers.ModelSerializer):
 
@@ -50,10 +53,23 @@ class CommentSerializer(serializers.ModelSerializer):
 
     created_by = SimpleUserSerializer(read_only=True, many=False)
 
+    def create(self, validated_data):
+        super().save(validated_data)
+
+        event_id = validated_data.get('event')
+        message = validated_data.get('message')
+
+        channel_layer = get_channel_layer()
+        event_group_name = 'event_%s' % event_id
+        async_to_sync(channel_layer.group_send)(event_group_name, {
+            "type": "comment.change",
+            "action": "add",
+            "comment": {"event_id": event_id, "comment": message}
+        })
+
     class Meta:
         model = Comment
         fields = ['id', 'created_by', 'event', 'message']
-
 
 
 class UserSerializer(serializers.ModelSerializer):

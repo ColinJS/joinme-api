@@ -71,6 +71,15 @@ class EventConsumer(WebsocketConsumer):
             'guest': guest
         }))
 
+    def comment_change(self, event):
+        action = event['action']
+        comment = event['comment']
+
+        self.send(text_data=json.dumps({
+            'type': 'comment_'+action,
+            'comment': comment
+        }))
+
 
 class UserConsumer(WebsocketConsumer):
 

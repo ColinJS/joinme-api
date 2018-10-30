@@ -616,6 +616,7 @@ class SharingEvent(APIView):
                                 "last_name": f_user.last_name,
                                 "avatar": f_user.avatars.last().url if f_user.avatars and f_user.avatars.last() else '',
                                 "state": 0,
+                                "comment": "",
                             },
                         })
 
