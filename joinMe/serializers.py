@@ -56,6 +56,7 @@ class CommentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         super().save(validated_data)
 
+        user = validated_data.get('created_by')
         event_id = validated_data.get('event')
         message = validated_data.get('message')
 
@@ -64,7 +65,7 @@ class CommentSerializer(serializers.ModelSerializer):
         async_to_sync(channel_layer.group_send)(event_group_name, {
             "type": "comment.change",
             "action": "add",
-            "comment": {"event_id": event_id, "comment": message}
+            "comment": {"user_id": user.id, "comment": message}
         })
 
     class Meta:
