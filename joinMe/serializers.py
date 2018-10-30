@@ -54,7 +54,7 @@ class CommentSerializer(serializers.ModelSerializer):
     created_by = SimpleUserSerializer(read_only=True, many=False)
 
     def create(self, validated_data):
-        super().save(validated_data)
+        super().create(validated_data)
 
         user = validated_data.get('created_by')
         event_id = validated_data.get('event')
