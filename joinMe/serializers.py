@@ -60,7 +60,7 @@ class CommentSerializer(serializers.ModelSerializer):
         event_id = validated_data.get('event')
         message = validated_data.get('message')
 
-        print(event_id)
+        print(validated_data)
 
 
         channel_layer = get_channel_layer()
