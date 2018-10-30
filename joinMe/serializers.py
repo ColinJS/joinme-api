@@ -57,14 +57,11 @@ class CommentSerializer(serializers.ModelSerializer):
         super().create(validated_data)
 
         user = validated_data.get('created_by')
-        event_id = validated_data.get('event')
+        event = validated_data.get('event')
         message = validated_data.get('message')
 
-        print(validated_data)
-
-
         channel_layer = get_channel_layer()
-        event_group_name = 'event_%s' % event_id
+        event_group_name = 'event_%s' % event.pk
         print('group name: ')
         print(event_group_name)
         async_to_sync(channel_layer.group_send)(event_group_name, {
