@@ -68,6 +68,7 @@ class CommentSerializer(serializers.ModelSerializer):
             "action": "add",
             "comment": {"user_id": user.id, "comment": message}
         })
+
         return super().create(validated_data)
 
     class Meta:
