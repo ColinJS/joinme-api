@@ -65,6 +65,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
         channel_layer = get_channel_layer()
         event_group_name = 'event_%s' % event_id
+        print('group name: ')
         print(event_group_name)
         async_to_sync(channel_layer.group_send)(event_group_name, {
             "type": "comment.change",
