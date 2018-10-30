@@ -60,6 +60,8 @@ class CommentSerializer(serializers.ModelSerializer):
         event_id = validated_data.get('event')
         message = validated_data.get('message')
 
+        print(event_id)
+
         channel_layer = get_channel_layer()
         event_group_name = 'event_%s' % event_id
         async_to_sync(channel_layer.group_send)(event_group_name, {
