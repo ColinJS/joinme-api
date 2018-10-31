@@ -7,6 +7,8 @@ from django.db import transaction, close_old_connections
 from django.shortcuts import get_object_or_404, render
 import datetime
 from django.utils import timezone
+from django.db.models.functions import Concat
+from django.db.models import Value
 
 import requests, os, boto3, random, string, time
 
@@ -164,8 +166,8 @@ class Users(APIView):
             filtered = request.query_params.get('filter', '').replace('?', '')
             search = request.query_params.get('search', '').replace('?', '')
             if search != '':
-                from django.db.models import Q
-                users = users.filter(Q(first_name__unaccent__icontains=search) | Q(last_name__unaccent__icontains=search))
+                queryset = users.annotate(fullname=Concat('first_name', Value(' '), 'last_name'))
+                users = queryset.filter(full_name__icontains=search)
 
             if filtered == 'no-friends':  # TODO: the ? is automatically added at the end of the url. Will have to debug that
                 from django.db.models import Q
