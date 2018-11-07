@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',
+    'django.contrib.gis',
 ]
 
 MIDDLEWARE = [
@@ -140,7 +141,7 @@ CHANNEL_LAYERS = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'joinmedb',
         'USER': 'postgres',
         'PASSWORD': '@da/07/jb@',
@@ -149,6 +150,9 @@ DATABASES = {
         'CONN_MAX_AGE': 500
     }
 }
+
+GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH')
 
 if os.environ.get('ENV') == 'HEROKU':
     db_from_env = dj_database_url.config()
