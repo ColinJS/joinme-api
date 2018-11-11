@@ -1,4 +1,11 @@
 from django.db import models
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis import geos
+from geopy.geocoders import GoogleV3
+from geopy.exc import GeocoderQueryError
+
+from urllib.error import URLError
+
 from django.contrib.auth.models import User
 import datetime
 from django.utils import timezone
@@ -50,6 +57,27 @@ class Place(models.Model):
     formatted_address = models.CharField(max_length=200, blank=False)
     place_id = models.CharField(max_length=200, blank=False)
     event = models.ForeignKey(Event, related_name='place', on_delete=models.CASCADE)
+    location = gis_models.PointField(u"longitude/lattitude", geography=True, blank=True, null=True)
+
+    objects = models.Manager()
+
+    def __unicode__(self):
+        return self.formatted_address
+
+    def save(self, **kwargs):
+        if not self.location:
+            address = u'%s %s' % (self.city, self.address)
+            address = address.encode('utf-8')
+            geocoder = GoogleV3('AIzaSyA8QQ8ADBfhHcnRn-UZFF_8lC7yGm1JLD0',)
+            try:
+                _, latlon = geocoder.geocode(address)
+            except (URLError, GeocoderQueryError, ValueError):
+                pass
+            else:
+                point = "POINT(%s %s)" % (latlon[1], latlon[0])
+                self.location = geos.fromstr(point)
+
+        super(Place, self).save()
 
 
 class Notification(models.Model):
