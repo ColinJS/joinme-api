@@ -151,8 +151,8 @@ DATABASES = {
     }
 }
 
-GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH')
-GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH')
+GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
 
 if os.environ.get('ENV') == 'HEROKU':
     db_from_env = dj_database_url.config()
