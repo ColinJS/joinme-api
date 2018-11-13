@@ -151,9 +151,8 @@ DATABASES = {
     }
 }
 
-#GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
-print(os.getenv('GDAL_LIBRARY_PATH'))
-GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
+GEOS_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgeos.so' if os.environ.get('ENV') == 'HEROKU' else os.getenv('GEOS_LIBRARY_PATH')
+GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV') == 'HEROKU' else os.getenv('GDAL_LIBRARY_PATH')
 
 
 if os.environ.get('ENV') == 'HEROKU':
