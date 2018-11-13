@@ -30,6 +30,11 @@ class Event(models.Model):
     ending_time = models.DateTimeField(default=timezone.now()+datetime.timedelta(hours=3))
     is_public = models.BooleanField(default=False)
 
+    @property
+    def last_place(self):
+        last_place = self.place.last() if self.place and self.place.last() else None
+        return last_place
+
     def __str__(self):
         return "%s %s" % (self.created_by.first_name, self.created_by.last_name)
 

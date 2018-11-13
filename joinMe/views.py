@@ -9,6 +9,8 @@ import datetime
 from django.utils import timezone
 from django.db.models.functions import Concat
 from django.db.models import Value
+from django.contrib.gis.measure import D
+from django.contrib.gis.geos import GEOSGeometry
 
 import requests, os, boto3, random, string, time
 
@@ -293,10 +295,18 @@ class EventList(APIView):
 
             my_events = user.my_events.filter(ending_time__gte=now, is_public=False)
             events = Event.objects.filter(ending_time__gte=now, is_public=False, guests__guest=user).distinct()
-            public_events = Event.objects.filter(ending_time__gte=now, is_public=True).distinct()
+            public_events = []
             notifications = user.notifications.filter(event__ending_time__gte=now, state=0)
 
             ctx = {'notifications': len(notifications), 'my_events': [], 'events': [], 'public_events': []}
+
+            longitude = request.query_params.get('longitude', '').replace('?', '')
+            latitude = request.query_params.get('latitude', '').replace('?', '')
+
+            if longitude != '' and latitude != '':
+                my_position = GEOSGeometry('POINT(%s %s)' % (longitude, latitude), srid=4326)
+                pubic_events = Event.objects.filter(ending_time__gte=now, is_public=True,
+                                                    place__location__distance_lte=(my_position, D(km=50))).distinct()
 
             for my_event in my_events:
                 video_url = my_event.videos.last().video
