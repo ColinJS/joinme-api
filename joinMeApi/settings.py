@@ -158,6 +158,7 @@ GDAL_LIBRARY_PATH = '/app/.heroku/vendor/lib/libgdal.so' if os.environ.get('ENV'
 if os.environ.get('ENV') == 'HEROKU':
     db_from_env = dj_database_url.config()
     DATABASES['default'].update(db_from_env)
+    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
