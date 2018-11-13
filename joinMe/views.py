@@ -246,7 +246,9 @@ class EventList(APIView):
                     video = Video(video=url)
                     video.save()
 
-                    event = Event(created_by=user, duration=duration, ending_time=timezone.now()+duration)
+                    is_public = True if 'public' in data and data['public'] else False
+
+                    event = Event(created_by=user, duration=duration, ending_time=timezone.now()+duration, is_public=is_public)
                     event.save()
                     event.videos.set([video])
                     event.save()
@@ -254,27 +256,7 @@ class EventList(APIView):
                     place = Place(formatted_address=place.get('formatted_address', ''), place_id=place.get('place_id', ''),event=event)
                     place.save()
 
-                    if 'public' in data and data['public']:
-                        users = User.objects.all()
-                        for f_user in users:
-                            if f_user != user and f_user.pk != 1:
-                                if f_user.profile.notification_key != "":
-                                    now = timezone.now()
-                                    badge = len(f_user.notifications.filter(event__ending_time__gte=now, state=0))
-                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), {'screen': 'event', 'event_id': event.pk}, time_stamp(event.ending_time), badge)
-                                channel_layer = get_channel_layer()
-                                user_group_name = 'user_%s' % f_user.pk
-                                async_to_sync(channel_layer.group_send)(user_group_name, {
-                                    "type": "notifs.change",
-                                    "action": "add",
-                                    "quantity": 1
-                                })
-                                notification = Notification(user=f_user, event=event, type_of_notification=0)
-                                notification.save()
-                                sharing = GuestToEvent(guest=f_user, event=event, state=0)
-                                sharing.save()
-
-                    elif 'friends' in data:
+                    if 'friends' in data:
                         for f in data['friends']:
                             f_user = User.objects.filter(pk=f['id']).first()
                             if f_user and f_user != user:
@@ -309,15 +291,12 @@ class EventList(APIView):
             user = request.user
             now = timezone.now()
 
-            my_events = user.my_events.filter(ending_time__gte=now)
-            events = []
+            my_events = user.my_events.filter(ending_time__gte=now, is_public=False)
+            events = user.events.filter(ending_time__gte=now, is_public=False).distinct()
+            public_events = Event.objects.filter(ending_time__gte=now, is_public=True).distinct()
             notifications = user.notifications.filter(event__ending_time__gte=now, state=0)
 
-            for e in user.events.all():
-                if e.event not in events and e.event.ending_time >= now:
-                    events.append(e.event)
-
-            ctx = {'notifications': len(notifications), 'my_events': [], 'events': []}
+            ctx = {'notifications': len(notifications), 'my_events': [], 'events': [], 'public_events': []}
 
             for my_event in my_events:
                 video_url = my_event.videos.last().video
@@ -327,6 +306,8 @@ class EventList(APIView):
                 event_notif = notifications.filter(event=my_event)
                 new_event = {
                     'id': my_event.pk,
+                    'is_public': my_event.is_public,
+                    'is_mine': True,
                     'creator': {
                         'url': my_event.created_by.avatars.last().url,
                         'first_name': my_event.created_by.first_name,
@@ -349,6 +330,8 @@ class EventList(APIView):
                 event_notif = notifications.filter(event=event)
                 new_event = {
                     'id': event.pk,
+                    'is_public': event.is_public,
+                    'is_mine': False,
                     'creator': {
                         'url': event.created_by.avatars.last().url,
                         'first_name': event.created_by.first_name,
@@ -362,6 +345,30 @@ class EventList(APIView):
                     'notifications': [{'type': notif.type_of_notification} for notif in event_notif]
                 }
                 ctx['events'].append(new_event)
+
+            for event in public_events:
+                video_url = event.videos.last().video
+                thumb_url_splitted = video_url.rsplit('/', 1)
+                thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
+
+                event_notif = notifications.filter(event=event)
+                new_event = {
+                    'id': event.pk,
+                    'is_public': event.is_public,
+                    'is_mine': (event.created_by == user),
+                    'creator': {
+                        'url': event.created_by.avatars.last().url,
+                        'first_name': event.created_by.first_name,
+                        'last_name': event.created_by.last_name
+                    },
+                    'coming': event.guests.filter(guest=user).first().state,
+                    'creation_date': event.created,
+                    'ending_time': event.ending_time,
+                    'video_url': video_url,
+                    'thumb_url': thumb_url,
+                    'notifications': [{'type': notif.type_of_notification} for notif in event_notif]
+                }
+                ctx['public_events'].append(new_event)
 
             return Response(ctx)
 
