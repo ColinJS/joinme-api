@@ -28,6 +28,7 @@ class Event(models.Model):
     created_by = models.ForeignKey(User, related_name='my_events', on_delete=models.DO_NOTHING, blank=True)
     duration = models.DurationField(blank=True, default=datetime.timedelta(hours=3))
     ending_time = models.DateTimeField(default=timezone.now()+datetime.timedelta(hours=3))
+    is_public = models.BooleanField(default=False)
 
     def __str__(self):
         return "%s %s" % (self.created_by.first_name, self.created_by.last_name)
