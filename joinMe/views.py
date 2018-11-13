@@ -292,7 +292,7 @@ class EventList(APIView):
             now = timezone.now()
 
             my_events = user.my_events.filter(ending_time__gte=now, is_public=False)
-            events = user.events.filter(ending_time__gte=now, is_public=False).distinct()
+            events = Event.objects.filter(ending_time__gte=now, is_public=False, guests__guest=user).distinct()
             public_events = Event.objects.filter(ending_time__gte=now, is_public=True).distinct()
             notifications = user.notifications.filter(event__ending_time__gte=now, state=0)
 
