@@ -66,7 +66,7 @@ class Place(models.Model):
 
     def save(self, **kwargs):
         if not self.location:
-            address = u'%s %s' % (self.city, self.address)
+            address = u'%s' % self.formatted_address
             address = address.encode('utf-8')
             geocoder = GoogleV3('AIzaSyA8QQ8ADBfhHcnRn-UZFF_8lC7yGm1JLD0',)
             try:
