@@ -322,8 +322,7 @@ class EventList(APIView):
                 }
                 ctx['my_events'].append(new_event)
 
-            for g_event in events:
-                event = g_event.event
+            for event in events:
                 video_url = event.videos.last().video
                 thumb_url_splitted = video_url.rsplit('/', 1)
                 thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
@@ -347,8 +346,7 @@ class EventList(APIView):
                 }
                 ctx['events'].append(new_event)
 
-            for g_event in public_events:
-                event = g_event.event
+            for event in public_events:
                 video_url = event.videos.last().video
                 thumb_url_splitted = video_url.rsplit('/', 1)
                 thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
@@ -363,7 +361,7 @@ class EventList(APIView):
                         'first_name': event.created_by.first_name,
                         'last_name': event.created_by.last_name
                     },
-                    'coming': event.guests.filter(guest=user).first().state,
+                    'coming': event.guests.filter(guest=user).first().state if event.guests.filter(guest=user).first() else 0,
                     'creation_date': event.created,
                     'ending_time': event.ending_time,
                     'video_url': video_url,
