@@ -75,6 +75,7 @@ class Place(models.Model):
                 pass
             else:
                 point = "POINT(%s %s)" % (latlon[1], latlon[0])
+                print(point)
                 self.location = geos.fromstr(point)
 
         super(Place, self).save()
