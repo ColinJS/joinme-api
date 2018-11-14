@@ -412,6 +412,7 @@ class EventList(APIView):
                     'thumb_url': thumb_url,
                     'notifications': [{'type': notif.type_of_notification} for notif in event_notif],
                     'guests': [],
+                    'distance': event.distance,
                 }
 
                 for guest in guests:
