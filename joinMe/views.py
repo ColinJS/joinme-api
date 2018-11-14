@@ -315,6 +315,7 @@ class EventList(APIView):
                 video_url = my_event.videos.last().video
                 thumb_url_splitted = video_url.rsplit('/', 1)
                 thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
+                guests = my_event.guests.all()
 
                 event_notif = notifications.filter(event=my_event)
                 new_event = {
@@ -331,14 +332,29 @@ class EventList(APIView):
                     'ending_time': my_event.ending_time,
                     'video_url': video_url,
                     'thumb_url': thumb_url,
-                    'notifications': [{'type': notif.type_of_notification} for notif in event_notif]
+                    'notifications': [{'type': notif.type_of_notification} for notif in event_notif],
+                    'guests': [],
                 }
+
+                for guest in guests:
+                    new_guest = {
+                        'first_name': guest.guest.first_name,
+                        'last_name': guest.guest.last_name,
+                        'state': guest.state,
+                        'avatar': guest.guest.avatars.last().url if guest.guest.avatars.last() else "",
+                        'id': guest.guest.pk,
+                    }
+                    if new_guest not in ctx['guests']:
+                        new_event['guests'].append(new_guest)
+
                 ctx['my_events'].append(new_event)
 
             for event in events:
                 video_url = event.videos.last().video
                 thumb_url_splitted = video_url.rsplit('/', 1)
                 thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
+
+                guests = event.guests.all()
 
                 event_notif = notifications.filter(event=event)
                 new_event = {
@@ -355,14 +371,29 @@ class EventList(APIView):
                     'ending_time': event.ending_time,
                     'video_url': video_url,
                     'thumb_url': thumb_url,
-                    'notifications': [{'type': notif.type_of_notification} for notif in event_notif]
+                    'notifications': [{'type': notif.type_of_notification} for notif in event_notif],
+                    'guests': [],
                 }
+
+                for guest in guests:
+                    new_guest = {
+                        'first_name': guest.guest.first_name,
+                        'last_name': guest.guest.last_name,
+                        'state': guest.state,
+                        'avatar': guest.guest.avatars.last().url if guest.guest.avatars.last() else "",
+                        'id': guest.guest.pk,
+                    }
+                    if new_guest not in ctx['guests']:
+                        new_event['guests'].append(new_guest)
+
                 ctx['events'].append(new_event)
 
             for event in public_events:
                 video_url = event.videos.last().video
                 thumb_url_splitted = video_url.rsplit('/', 1)
                 thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
+
+                guests = event.guests.all()
 
                 event_notif = notifications.filter(event=event)
                 new_event = {
@@ -379,8 +410,21 @@ class EventList(APIView):
                     'ending_time': event.ending_time,
                     'video_url': video_url,
                     'thumb_url': thumb_url,
-                    'notifications': [{'type': notif.type_of_notification} for notif in event_notif]
+                    'notifications': [{'type': notif.type_of_notification} for notif in event_notif],
+                    'guests': [],
                 }
+
+                for guest in guests:
+                    new_guest = {
+                        'first_name': guest.guest.first_name,
+                        'last_name': guest.guest.last_name,
+                        'state': guest.state,
+                        'avatar': guest.guest.avatars.last().url if guest.guest.avatars.last() else "",
+                        'id': guest.guest.pk,
+                    }
+                    if new_guest not in ctx['guests']:
+                        new_event['guests'].append(new_guest)
+
                 ctx['public_events'].append(new_event)
 
             return Response(ctx)
