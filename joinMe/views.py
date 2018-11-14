@@ -344,7 +344,7 @@ class EventList(APIView):
                         'avatar': guest.guest.avatars.last().url if guest.guest.avatars.last() else "",
                         'id': guest.guest.pk,
                     }
-                    if new_guest not in ctx['guests']:
+                    if new_guest not in new_event['guests']:
                         new_event['guests'].append(new_guest)
 
                 ctx['my_events'].append(new_event)
@@ -383,7 +383,7 @@ class EventList(APIView):
                         'avatar': guest.guest.avatars.last().url if guest.guest.avatars.last() else "",
                         'id': guest.guest.pk,
                     }
-                    if new_guest not in ctx['guests']:
+                    if new_guest not in new_event['guests']:
                         new_event['guests'].append(new_guest)
 
                 ctx['events'].append(new_event)
@@ -422,7 +422,7 @@ class EventList(APIView):
                         'avatar': guest.guest.avatars.last().url if guest.guest.avatars.last() else "",
                         'id': guest.guest.pk,
                     }
-                    if new_guest not in ctx['guests']:
+                    if new_guest not in new_event['guests']:
                         new_event['guests'].append(new_guest)
 
                 ctx['public_events'].append(new_event)
