@@ -307,7 +307,7 @@ class EventList(APIView):
                 my_position = GEOSGeometry('POINT(%s %s)' % (longitude, latitude), srid=4326)
                 public_events = Event.objects.filter(ending_time__gte=now,
                                                      is_public=True,
-                                                     last_place__location__distance_lte=(my_position, D(km=50))).distinct()
+                                                     place__location__distance_lte=(my_position, D(km=50))).distinct()
 
             for my_event in my_events:
                 video_url = my_event.videos.last().video
