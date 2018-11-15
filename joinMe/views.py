@@ -529,11 +529,11 @@ class EventDetails(APIView):
             data = request.data
 
             if 'coming' in data:
-                guestsToEvent = GuestToEvent.objects.filter(event__pk=event_id)
-                guestToEvent = guestsToEvent.filter(guest__pk=user.pk)
 
-                g = guestToEvent.first()
-                if g:
+                event = get_object_or_404(Event, pk=event_id)
+                g = event.guests.filter(guest=user).first()
+
+                if g and not event.is_public:
                     g.state = data['coming']
                     g.save()
 
@@ -545,7 +545,7 @@ class EventDetails(APIView):
                         "new_status": data['coming']
                     })
 
-                    for guest in guestsToEvent:
+                    for guest in event.guests.all():
                         f_user = guest.guest
                         if g.event.created_by != f_user and f_user != user and data['coming'] == 1:
                             print("send notif to %s" % f_user.first_name)
@@ -577,6 +577,20 @@ class EventDetails(APIView):
                         send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time), badge)
 
                     return Response({'message': 'Update your state to the event is done'})
+
+                elif event.is_public:
+
+                    if g and data['coming'] == 2:
+                        g.delete()
+                    elif data['coming'] == 1:
+                        if not g:
+                            g = GuestToEvent(guest=user, event=event, state=data['coming'])
+                        else:
+                            g.state = data['coming']
+                        g.save()
+
+                else:
+                    return Response({'message': 'You\'re not invited to this event'})
 
             return Response({'message': 'Can\'t find coming variable'})
 
