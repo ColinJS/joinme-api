@@ -582,6 +582,15 @@ class EventDetails(APIView):
 
                     if g and data['coming'] == 2:
                         g.delete()
+                        channel_layer = get_channel_layer()
+                        event_group_name = 'event_%s' % event_id
+                        async_to_sync(channel_layer.group_send)(event_group_name, {
+                            "type": "guests.change",
+                            "action": "delete",
+                            "guest": {
+                                "id": user.pk,
+                            },
+                        })
                     elif data['coming'] == 1:
                         if not g:
                             g = GuestToEvent(guest=user, event=event, state=data['coming'])
