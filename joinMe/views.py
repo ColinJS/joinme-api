@@ -585,8 +585,29 @@ class EventDetails(APIView):
                     elif data['coming'] == 1:
                         if not g:
                             g = GuestToEvent(guest=user, event=event, state=data['coming'])
+                            channel_layer = get_channel_layer()
+                            event_group_name = 'event_%s' % event_id
+                            async_to_sync(channel_layer.group_send)(event_group_name, {
+                                "type": "guests.change",
+                                "action": "add",
+                                "guest": {
+                                    "id": user.pk,
+                                    "first_name": user.first_name,
+                                    "last_name": user.last_name,
+                                    "avatar": user.avatars.last().url if user.avatars and user.avatars.last() else '',
+                                    "state": 1,
+                                    "comment": "",
+                                },
+                            })
                         else:
                             g.state = data['coming']
+                            channel_layer = get_channel_layer()
+                            event_group_name = 'event_%s' % event_id
+                            async_to_sync(channel_layer.group_send)(event_group_name, {
+                                "type": "status.change",
+                                "guest_id": user.pk,
+                                "new_status": data['coming']
+                            })
                         g.save()
 
                 else:
