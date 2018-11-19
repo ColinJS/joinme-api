@@ -76,13 +76,15 @@ class Place(models.Model):
             address = address.encode('utf-8')
             geocoder = GoogleV3('AIzaSyA8QQ8ADBfhHcnRn-UZFF_8lC7yGm1JLD0',)
             try:
-                _, latlon = geocoder.geocode(address)
+                location_response = geocoder.geocode(address)
             except (URLError, GeocoderQueryError, ValueError):
                 pass
             else:
-                point = "POINT(%s %s)" % (latlon[1], latlon[0])
-                print(point)
-                self.location = geos.fromstr(point)
+                if location_response is not None:
+                    latlon = location_response[1]
+                    point = "POINT(%s %s)" % (latlon[1], latlon[0])
+                    print(point)
+                    self.location = geos.fromstr(point)
 
         super(Place, self).save()
 
