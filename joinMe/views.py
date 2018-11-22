@@ -293,10 +293,18 @@ class EventList(APIView):
         if request.auth:
             user = request.user
             now = timezone.now()
+            coming = request.query_params.get('coming', '').replace('?', '')
 
-            my_events = user.my_events.filter(ending_time__gte=now, is_public=False)
-            events = Event.objects.filter(ending_time__gte=now, is_public=False, guests__guest=user).distinct()
+            my_events = user.my_events.filter(ending_time__gte=now)
+            events = Event.objects.filter(ending_time__gte=now, guests__guest=user).distinct()
             public_events = []
+
+            if coming != '':
+                events = events.filter(guests_state=1)
+            else:
+                my_events = my_events.filter(is_public=True)
+                events = events.filter(is_public=True)
+
             notifications = user.notifications.filter(event__ending_time__gte=now, state=0)
 
             ctx = {'notifications': len(notifications), 'my_events': [], 'events': [], 'public_events': []}
