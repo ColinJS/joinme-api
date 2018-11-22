@@ -627,6 +627,27 @@ class EventDetails(APIView):
         return Response({'response': request.auth})
 
 
+class VideoEvent(APIView):
+
+    def post(self, request, event_id):
+
+        if request.auth:
+            user = request.user
+            data = request.data
+            event = get_object_or_404(Event, pk=event_id)
+
+            if event and 'video' in data:
+                with transaction.atomic():
+                    url = data['video'].replace('/input/', '/output/').rsplit('.', 1)[0]+".mp4"
+
+                    video = Video(video=url, event=event)
+                    video.save()
+
+                return Response({"message": "Video added to the event"})
+            return Response({"message": "You need to put a video url in 'video'"})
+        return Response({"message": "You're not authenticated"})
+
+
 class FriendList(APIView):
 
     def get(self, request):
