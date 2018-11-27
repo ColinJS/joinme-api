@@ -300,7 +300,7 @@ class EventList(APIView):
             public_events = []
 
             if coming != '':
-                events = events.filter(guests_state=1)
+                events = events.filter(guests__state=1)
             else:
                 my_events = my_events.filter(is_public=True)
                 events = events.filter(is_public=True)
