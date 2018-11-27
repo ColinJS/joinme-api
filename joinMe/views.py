@@ -310,15 +310,15 @@ class EventList(APIView):
 
             ctx = {'notifications': len(notifications), 'my_events': [], 'events': [], 'public_events': []}
 
-            longitude = request.query_params.get('longitude', '').replace('?', '')
-            latitude = request.query_params.get('latitude', '').replace('?', '')
+            #longitude = request.query_params.get('longitude', '').replace('?', '')
+            #latitude = request.query_params.get('latitude', '').replace('?', '')
 
-            if longitude != '' and latitude != '':
-                my_position = GEOSGeometry('POINT(%s %s)' % (longitude, latitude), srid=4326)
-                public_events = Event.objects.filter(ending_time__gte=now,
-                                                     is_public=True,
-                                                     place__location__distance_lte=(my_position, D(km=50))).distinct()\
-                    .annotate(distance=Distance('place__location', my_position)).order_by('distance')
+            #if longitude != '' and latitude != '':
+            #    my_position = GEOSGeometry('POINT(%s %s)' % (longitude, latitude), srid=4326)
+            #    public_events = Event.objects.filter(ending_time__gte=now,
+            #                                         is_public=True,
+            #                                         place__location__distance_lte=(my_position, D(km=50))).distinct()\
+            #        .annotate(distance=Distance('place__location', my_position)).order_by('distance')
 
             for my_event in my_events:
                 video_url = my_event.videos.last().video
