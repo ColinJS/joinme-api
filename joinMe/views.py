@@ -301,9 +301,10 @@ class EventList(APIView):
 
             if coming != '':
                 events = events.filter(guests__state=1)
+                print('Get only coming events')e
             else:
-                my_events = my_events.filter(is_public=True)
-                events = events.filter(is_public=True)
+                my_events = my_events.filter(is_public=False)
+                events = events.filter(is_public=False)
 
             notifications = user.notifications.filter(event__ending_time__gte=now, state=0)
 
