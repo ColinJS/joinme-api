@@ -321,8 +321,8 @@ class EventList(APIView):
             #        .annotate(distance=Distance('place__location', my_position)).order_by('distance')
 
             for my_event in my_events:
-                video_url = my_event.videos.last().video
-                thumb_url_splitted = video_url.rsplit('/', 1)
+                video_url = my_event.videos.values_list('video', flat=True).all()
+                thumb_url_splitted = video_url[0].rsplit('/', 1)
                 thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
                 guests = my_event.guests.all()
 
@@ -359,8 +359,8 @@ class EventList(APIView):
                 ctx['my_events'].append(new_event)
 
             for event in events:
-                video_url = event.videos.last().video
-                thumb_url_splitted = video_url.rsplit('/', 1)
+                video_url = event.videos.values_list('video', flat=True).all()
+                thumb_url_splitted = video_url[0].rsplit('/', 1)
                 thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
 
                 guests = event.guests.all()
@@ -398,8 +398,8 @@ class EventList(APIView):
                 ctx['events'].append(new_event)
 
             for event in public_events:
-                video_url = event.videos.last().video
-                thumb_url_splitted = video_url.rsplit('/', 1)
+                video_url = event.videos.values_list('video', flat=True).all()
+                thumb_url_splitted = video_url[0].rsplit('/', 1)
                 thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
 
                 guests = event.guests.all()
@@ -477,8 +477,8 @@ class EventDetails(APIView):
             guests = event.guests.all()
             notifications = user.notifications.filter(event=event)
             comments = Comment.objects.filter(event=event)
-            video_url = event.videos.last().video
-            thumb_url_splitted = video_url.rsplit('/', 1)
+            video_url = event.videos.values_list('video', flat=True).all()
+            thumb_url_splitted = video_url[0].rsplit('/', 1)
             thumb_url = thumb_url_splitted[0] + '/thumb-' + thumb_url_splitted[1].replace('.mp4', '-00001.png')
 
             ctx = {
