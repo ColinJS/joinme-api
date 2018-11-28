@@ -328,6 +328,9 @@ class EventList(APIView):
             #                                         place__location__distance_lte=(my_position, D(km=50))).distinct()\
             #        .annotate(distance=Distance('place__location', my_position)).order_by('distance')
 
+            public_events = Event.objects.filter(ending_time__gte=now, is_public=True).distinct()
+
+
             for my_event in my_events:
                 video_url = my_event.videos.values_list('video', flat=True).all()
                 thumb_url_splitted = video_url[0].rsplit('/', 1)
