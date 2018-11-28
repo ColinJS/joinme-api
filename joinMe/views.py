@@ -232,11 +232,11 @@ class EventList(APIView):
         if request.auth:
             user = request.user
             data = request.data
-            place = {'formatted_address': '', 'place_id': '', 'longitude': '', 'latitude': ''}
+            placeData = {'formatted_address': '', 'place_id': '', 'longitude': '', 'latitude': ''}
             duration = datetime.timedelta(hours=3)
 
             if 'place' in data:
-                place = data['place']
+                placeData = data['place']
 
             if 'duration' in data:
                 duration = datetime.timedelta(hours=int(data['duration']['hours']), minutes=int(data['duration']['minutes']))
@@ -255,11 +255,11 @@ class EventList(APIView):
                     event.videos.set([video])
                     event.save()
 
-                    place = Place(formatted_address=place.get('formatted_address', ''),
-                                  place_id=place.get('place_id', ''), event=event)
+                    place = Place(formatted_address=placeData.get('formatted_address', ''),
+                                  place_id=placeData.get('place_id', ''), event=event)
 
-                    longitude = place.get('longitude', '')
-                    latitude = place.get('latitude', '')
+                    longitude = placeData.get('longitude', '')
+                    latitude = placeData.get('latitude', '')
                     if longitude != '' and latitude != '':
                         point = "POINT(%s %s)" % (longitude, latitude)
                         location = geos.fromstr(point)
