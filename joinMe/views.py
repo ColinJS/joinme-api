@@ -9,9 +9,7 @@ import datetime
 from django.utils import timezone
 from django.db.models.functions import Concat
 from django.db.models import Value
-from django.contrib.gis.measure import D
-from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis import geos
 
 import requests, os, boto3, random, string, time
 
@@ -214,6 +212,7 @@ class UserGroupEndPoint(viewsets.ModelViewSet):
 
 
 class CommentEndPoint(viewsets.ModelViewSet):
+
     serializer_class = CommentSerializer
     permission_classes = (IsAuthenticated,)
 
@@ -233,7 +232,7 @@ class EventList(APIView):
         if request.auth:
             user = request.user
             data = request.data
-            place = {'formatted_address': '', 'place_id': ''}
+            place = {'formatted_address': '', 'place_id': '', 'longitude': '', 'latitude': ''}
             duration = datetime.timedelta(hours=3)
 
             if 'place' in data:
@@ -256,7 +255,16 @@ class EventList(APIView):
                     event.videos.set([video])
                     event.save()
 
-                    place = Place(formatted_address=place.get('formatted_address', ''), place_id=place.get('place_id', ''),event=event)
+                    place = Place(formatted_address=place.get('formatted_address', ''),
+                                  place_id=place.get('place_id', ''), event=event)
+
+                    longitude = place.get('longitude', '')
+                    latitude = place.get('latitude', '')
+                    if longitude != '' and latitude != '':
+                        point = "POINT(%s %s)" % (longitude, latitude)
+                        location = geos.fromstr(point)
+                        place.location = location
+
                     place.save()
 
                     if 'friends' in data:
