@@ -133,9 +133,8 @@ class FirstConnection(APIView):
             user = request.user
 
             if 'notification_key' in request.data:
-                if user.profile.notification_key == "":
-                    user.profile.notification_key = request.data['notification_key']
-                    user.profile.save()
+                user.profile.notification_key = request.data['notification_key']
+                user.profile.save()
 
                 return Response({"notification": True})
 
