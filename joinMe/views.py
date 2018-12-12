@@ -80,15 +80,12 @@ class FirstConnection(APIView):
                             }
                 )
 
-                print(response)
                 if response.status_code == 200:
                     hash_key = str(time.time()*100).split('.')[0].join([random.choice(string.ascii_letters + string.digits) for _ in range(4)])
                     key = 'avatar/avatar_' + hash_key + '.jpg'
                     url = 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, key)
 
                     s3_response = s3.Bucket(S3_BUCKET).put_object(ACL='public-read', Key=key, Body=response.content)
-
-                    print(s3_response)
 
                     if response.status_code == 200:
                         # return Response(user.avatars.all()[0].url)
@@ -710,8 +707,10 @@ class FriendList(APIView):
                     if not alreadyExist:
                         friendship = Friendship(creator=user, friend=friend, state=1)
                         friendship.save()
-                        if friend.profile.notification_key != "":
+                        if hasattr(friend, 'profile') and friend.profile.notification_key != "":
                             send_push_message(friend.profile.notification_key, "You and %s are now friends." % (user.first_name))
+                        else:
+                            print('%s %s' % (friend.first_name, friend.last_name))
 
                     return Response({"message": "Done"})
                 return Response({"error": "No friend found"})
@@ -780,8 +779,10 @@ class SharingEvent(APIView):
 
                         notification = Notification(user=f_user, event=event, type_of_notification=0)
                         notification.save()
-                        if f_user.profile.notification_key != "":
+                        if hasattr(f_user, 'profile') and f_user.profile.notification_key != '':
                             send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (event.created_by.first_name))
+                        else:
+                            print('%s %s' % (f_user.first_name, f_user.last_name))
 
             ctx = {'response': []}
             guests = [gte.guest for gte in GuestToEvent.objects.filter(event__pk=event.pk)]
