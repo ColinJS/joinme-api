@@ -573,10 +573,10 @@ class EventDetails(APIView):
                             })
                             notification = Notification(user=f_user, event=g.event, type_of_notification=1)
                             notification.save()
-                            #if f_user.profile.notification_key != "":
-                            #    now = timezone.now()
-                            #    badge = len(f_user.notifications.filter(event__ending_time__gte=now, state=0))
-                            #    send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time), badge)
+                            if hasattr(f_user, 'profile') and f_user.profile.notification_key != "":
+                                now = timezone.now()
+                                badge = len(f_user.notifications.filter(event__ending_time__gte=now, state=0))
+                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time), badge)
 
                     if user != g.event.created_by and data['coming'] == 1:
                         print("send notif to %s" % g.event.created_by.first_name)
@@ -588,9 +588,10 @@ class EventDetails(APIView):
                         })
                         notification = Notification(user=g.event.created_by, event=g.event, type_of_notification=1)
                         notification.save()
-                        #now = timezone.now()
-                        #badge = len(g.event.created_by.notifications.filter(event__ending_time__gte=now, state=0))
-                        #send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time), badge)
+                        if hasattr(g.event.created_by, 'profile'):
+                            now = timezone.now()
+                            badge = len(g.event.created_by.notifications.filter(event__ending_time__gte=now, state=0))
+                            send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time), badge)
 
                     return Response({'message': 'Update your state to the event is done'})
 
