@@ -58,6 +58,13 @@ def send_push_message(token, message, extra=None, expiration=10800, badge=0):
         pass
 
 
+def send_push_notification(user, message, body=None):
+    if hasattr(user, 'profile') and user.profile.notification_key != "":
+        now = timezone.now()
+        badge = len(user.notifications.filter(event__ending_time__gte=now, state=0))
+        send_push_message(user.profile.notification_key, message, body, badge)
+
+
 # TODO: Add try and catch and test ...
 class FirstConnection(APIView):
 
@@ -217,7 +224,27 @@ class CommentEndPoint(viewsets.ModelViewSet):
         return user.event_comments.all()
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+        user = self.request.user
+        instance = serializer.save(created_by=self.request.user)
+
+        from django.db.models import Q
+        guests = GuestToEvent.objects.filter(Q(event=instance.event, state=0) | Q(event=instance.event, state=1))
+        is_event_owner = user == instance.event.created_by
+        for guest in guests:
+            f_user = guest.guest
+            if f_user == user:
+                continue
+            message = "%s wrote a comment: \"%s\"" % (user.first_name, instance.message) if is_event_owner \
+                      else "%s wrote a comment on %s'event: \"%s\"" % \
+                            (user.first_name, instance.event.created_by.first_name, instance.message)
+
+            send_push_notification(f_user, message, {'screen': 'event', 'event_id': instance.event.pk})
+
+        if not is_event_owner:
+            message = "%s wrote a comment on your event: \"%s\"" % (user.first_name, instance.message)
+            send_push_notification(instance.event.created_by, message, {'screen': 'event', 'event_id': instance.event.pk})
+
+
 
 
 class EventList(APIView):
@@ -267,10 +294,7 @@ class EventList(APIView):
                         for f in data['friends']:
                             f_user = User.objects.filter(pk=f['id']).first()
                             if f_user and f_user != user:
-                                if f_user.profile.notification_key != "":
-                                    now = timezone.now()
-                                    badge = len(f_user.notifications.filter(event__ending_time__gte=now, state=0))
-                                    send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (user.first_name), {'screen': 'event', 'event_id': event.pk}, time_stamp(event.ending_time), badge)
+                                send_push_notification(f_user,  "%s invited you to an event." % user.first_name, {'screen': 'event', 'event_id': event.pk})
                                 channel_layer = get_channel_layer()
                                 user_group_name = 'user_%s' % f_user.pk
                                 async_to_sync(channel_layer.group_send)(user_group_name, {
@@ -561,7 +585,9 @@ class EventDetails(APIView):
                         "new_status": data['coming']
                     })
 
-                    for guest in event.guests.all():
+                    from django.db.models import Q
+                    guests = GuestToEvent.objects.filter(Q(event=event, state=0) | Q(event=event, state=1))
+                    for guest in guests:
                         f_user = guest.guest
                         if g.event.created_by != f_user and f_user != user and data['coming'] == 1:
                             print("send notif to %s" % f_user.first_name)
@@ -573,10 +599,8 @@ class EventDetails(APIView):
                             })
                             notification = Notification(user=f_user, event=g.event, type_of_notification=1)
                             notification.save()
-                            if hasattr(f_user, 'profile') and f_user.profile.notification_key != "":
-                                now = timezone.now()
-                                badge = len(f_user.notifications.filter(event__ending_time__gte=now, state=0))
-                                send_push_message(f_user.profile.notification_key, "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time), badge)
+
+                            send_push_notification(f_user,  "%s is joining %s." % (g.guest.first_name, g.event.created_by.first_name), {'screen': 'event', 'event_id': g.event.pk})
 
                     if user != g.event.created_by and data['coming'] == 1:
                         print("send notif to %s" % g.event.created_by.first_name)
@@ -588,10 +612,7 @@ class EventDetails(APIView):
                         })
                         notification = Notification(user=g.event.created_by, event=g.event, type_of_notification=1)
                         notification.save()
-                        if hasattr(g.event.created_by, 'profile'):
-                            now = timezone.now()
-                            badge = len(g.event.created_by.notifications.filter(event__ending_time__gte=now, state=0))
-                            send_push_message(g.event.created_by.profile.notification_key, "%s is joining you." % g.guest.first_name, {'screen': 'event', 'event_id': g.event.pk}, time_stamp(g.event.ending_time), badge)
+                        send_push_notification(g.event.created_by, "%s is joining you." % g.guest.first_name, {'screen': 'event', 'event_id': g.event.pk})
 
                     return Response({'message': 'Update your state to the event is done'})
 
@@ -660,6 +681,20 @@ class VideoEvent(APIView):
                     video = Video(video=url, event=event)
                     video.save()
 
+                from django.db.models import Q
+                guests = GuestToEvent.objects.filter(Q(event=event, state=1) | Q(event=event, state=0))
+                is_event_owner = (user == event.created_by)
+                for guest in guests:
+                    f_user = guest.guest
+                    if f_user == user:
+                        continue
+                    if is_event_owner:
+                        send_push_notification(f_user, "%s added a new video" % user.first_name, {'screen': 'event', 'event_id': event.pk})
+                    else:
+                        send_push_notification(f_user, "%s added a video to %s'event" % (user.first_name, event.created_by.first_name), {'screen': 'event', 'event_id': event.pk})
+
+                if not is_event_owner:
+                    send_push_notification(event.created_by, "%s added a new viseo to your event" % user.first_name, {'screen': 'event', 'event_id': event.pk})
                 return Response({"message": "Video added to the event"})
             return Response({"message": "You need to put a video url in 'video'"})
         return Response({"message": "You're not authenticated"})
@@ -708,10 +743,7 @@ class FriendList(APIView):
                     if not alreadyExist:
                         friendship = Friendship(creator=user, friend=friend, state=1)
                         friendship.save()
-                        if hasattr(friend, 'profile') and friend.profile.notification_key != "":
-                            send_push_message(friend.profile.notification_key, "You and %s are now friends." % (user.first_name))
-                        else:
-                            print('%s %s' % (friend.first_name, friend.last_name))
+                        send_push_notification(friend.profile.notification_key, "You and %s are now friends." % (user.first_name))
 
                     return Response({"message": "Done"})
                 return Response({"error": "No friend found"})
@@ -780,10 +812,7 @@ class SharingEvent(APIView):
 
                         notification = Notification(user=f_user, event=event, type_of_notification=0)
                         notification.save()
-                        if hasattr(f_user, 'profile') and f_user.profile.notification_key != '':
-                            send_push_message(f_user.profile.notification_key, "%s invited you to an event." % (event.created_by.first_name))
-                        else:
-                            print('%s %s' % (f_user.first_name, f_user.last_name))
+                        send_push_notification(f_user.profile.notification_key, "%s invited you to %s'event." % (user.first_name, event.created_by.first_name))
 
             ctx = {'response': []}
             guests = [gte.guest for gte in GuestToEvent.objects.filter(event__pk=event.pk)]
