@@ -522,7 +522,9 @@ class EventDetails(APIView):
                     'id': event.created_by.pk,
                     'first_name': event.created_by.first_name,
                     'last_name': event.created_by.last_name,
-                    'avatar': event.created_by.avatars.last().url
+                    'avatar': event.created_by.avatars.last().url,
+                    'state': 1,     # The creator is always coming
+                    'comment': (comments.filter(created_by=event.created_by).last().message if comments.filter(created_by=event.created_by).last() else '')
                 },
                 'place': {
                     'formatted_address': event.place.last().formatted_address,
@@ -544,7 +546,7 @@ class EventDetails(APIView):
                     'state': guest.state,
                     'avatar': guest.guest.avatars.last().url if guest.guest.avatars.last() else "",
                     'id': guest.guest.pk,
-                    'comment': (comments.filter(created_by=guest.guest).last().message if comments.filter(created_by=guest.guest).first() else ''),
+                    'comment': (comments.filter(created_by=guest.guest).last().message if comments.filter(created_by=guest.guest).last() else ''),
                 }
                 if new_guest not in ctx['guests']:
                     ctx['guests'].append(new_guest)
