@@ -690,13 +690,14 @@ class VideoEvent(APIView):
                     f_user = guest.guest
                     if f_user == user:
                         continue
-                    if is_event_owner:
-                        send_push_notification(f_user, "%s added a new video" % user.first_name, {'screen': 'event', 'event_id': event.pk})
-                    else:
-                        send_push_notification(f_user, "%s added a video to %s'event" % (user.first_name, event.created_by.first_name), {'screen': 'event', 'event_id': event.pk})
+                    message = "%s added a new video" % user.first_name if is_event_owner else \
+                        "%s added a video to %s'event" % (user.first_name, event.created_by.first_name)
+
+                    send_push_notification(f_user, message, {'screen': 'event', 'event_id': event.pk})
 
                 if not is_event_owner:
                     send_push_notification(event.created_by, "%s added a new viseo to your event" % user.first_name, {'screen': 'event', 'event_id': event.pk})
+
                 return Response({"message": "Video added to the event"})
             return Response({"message": "You need to put a video url in 'video'"})
         return Response({"message": "You're not authenticated"})
