@@ -111,12 +111,12 @@ class Comment(models.Model):
     message = models.CharField(max_length=600, blank=False)
 
 
-class Page(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='my_page', on_delete=models.DO_NOTHING)
-    followers = models.ManyToManyField(User, related_name='followed_page')
-    events = models.ManyToManyField(Event, related_name='pages')
-    name = models.CharField(max_length=200, blank=False)
-    description = models.CharField(max_length=600, blank=True)
+# class Page(models.Model):
+#    created = models.DateTimeField(auto_now_add=True)
+#    created_by = models.ForeignKey(User, related_name='my_page', on_delete=models.DO_NOTHING)
+#    followers = models.ManyToManyField(User, related_name='followed_page')
+#    events = models.ManyToManyField(Event, related_name='pages')
+#    name = models.CharField(max_length=200, blank=False)
+#    description = models.CharField(max_length=600, blank=True)
 
 

@@ -696,7 +696,7 @@ class VideoEvent(APIView):
                     send_push_notification(f_user, message, {'screen': 'event', 'event_id': event.pk})
 
                 if not is_event_owner:
-                    send_push_notification(event.created_by, "%s added a new viseo to your event" % user.first_name, {'screen': 'event', 'event_id': event.pk})
+                    send_push_notification(event.created_by, "%s added a new video to your event" % user.first_name, {'screen': 'event', 'event_id': event.pk})
 
                 return Response({"message": "Video added to the event"})
             return Response({"message": "You need to put a video url in 'video'"})
