@@ -236,13 +236,13 @@ class CommentEndPoint(viewsets.ModelViewSet):
             f_user = guest.guest
             if f_user == user:
                 continue
-            message = "%s: \"%s\"" % (user.first_name, instance.message)
+            message = "%s: %s" % (user.first_name, instance.message)
             title = "%s's event"
 
             send_push_notification(f_user, message, {'screen': 'event', 'event_id': instance.event.pk}, title)
 
         if not is_event_owner:
-            message = "%s: \"%s\"" % (user.first_name, instance.message)
+            message = "%s: %s" % (user.first_name, instance.message)
             send_push_notification(instance.event.created_by, message, {'screen': 'event', 'event_id': instance.event.pk}, 'Your event')
 
 
