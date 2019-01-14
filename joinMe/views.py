@@ -33,12 +33,14 @@ close_old_connections()
 def time_stamp(myTime):
     return int(time.mktime(myTime.timetuple()) * 1000)
 
+
 # Basic arguments. You should extend this function with the push features you
 # want to use, or simply pass in a `PushMessage` object.
-def send_push_message(token, message, extra=None, expiration=10800, badge=0):
+def send_push_message(token, message, extra=None, title=None, badge=0):
     try:
         response = PushClient().publish(
             PushMessage(to=token,
+                        title=title,
                         body=message,
                         data=extra,
                         badge=badge))
@@ -58,11 +60,11 @@ def send_push_message(token, message, extra=None, expiration=10800, badge=0):
         pass
 
 
-def send_push_notification(user, message, body=None):
+def send_push_notification(user, message, body=None, title=None):
     if hasattr(user, 'profile') and user.profile.notification_key != "":
         now = timezone.now()
         badge = len(user.notifications.filter(event__ending_time__gte=now, state=0))
-        send_push_message(user.profile.notification_key, message, body, badge)
+        send_push_message(user.profile.notification_key, message, body, title, badge)
 
 
 # TODO: Add try and catch and test ...
@@ -234,15 +236,14 @@ class CommentEndPoint(viewsets.ModelViewSet):
             f_user = guest.guest
             if f_user == user:
                 continue
-            message = "%s wrote a comment: \"%s\"" % (user.first_name, instance.message) if is_event_owner \
-                      else "%s wrote a comment on %s'event: \"%s\"" % \
-                            (user.first_name, instance.event.created_by.first_name, instance.message)
+            message = "%s: \"%s\"" % (user.first_name, instance.message)
+            title = "%s's event"
 
-            send_push_notification(f_user, message, {'screen': 'event', 'event_id': instance.event.pk})
+            send_push_notification(f_user, message, {'screen': 'event', 'event_id': instance.event.pk}, title)
 
         if not is_event_owner:
-            message = "%s wrote a comment on your event: \"%s\"" % (user.first_name, instance.message)
-            send_push_notification(instance.event.created_by, message, {'screen': 'event', 'event_id': instance.event.pk})
+            message = "%s: \"%s\"" % (user.first_name, instance.message)
+            send_push_notification(instance.event.created_by, message, {'screen': 'event', 'event_id': instance.event.pk}, 'Your event')
 
 
 
