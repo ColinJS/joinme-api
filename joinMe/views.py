@@ -237,7 +237,7 @@ class CommentEndPoint(viewsets.ModelViewSet):
             if f_user == user:
                 continue
             message = "%s: %s" % (user.first_name, instance.message)
-            title = "%s's event"
+            title = "%s's event" % instance.event.created_by.first_name
 
             send_push_notification(f_user, message, {'screen': 'event', 'event_id': instance.event.pk}, title)
 
