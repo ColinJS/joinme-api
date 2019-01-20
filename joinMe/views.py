@@ -191,7 +191,7 @@ class Users(APIView):
                     }
                     ctx['users'].append(new_user)
                     if user.first_name[0]:
-                        if not ctx['alpha_sorted_user'].has_key(user.first_name[0].lower()):
+                        if user.first_name[0].lower() not in ctx['alpha_sorted_user']:
                             ctx['alpha_sorted_user'][user.first_name[0].lower()] = []
                         ctx['alpha_sorted_user'][user.first_name[0].lower()].append(new_user)
 
