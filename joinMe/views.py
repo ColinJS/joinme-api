@@ -71,11 +71,14 @@ def get_facebook_friends(user):
     response = requests.get('https://graph.facebook.com/me/friends', params=user.social_auth.get(provider="facebook").extra_data)
 
     if response.status_code == 200:
-        friends = []
+        friends = None
         for friend in response.json()["data"]:
             new_friends = User.objects.filter(social_auth__uid=friend['id']).first()
             if new_friends:
-                friends.append(new_friends)
+                if not friends:
+                    friends = new_friends
+                else:
+                    friends.union(new_friends)
 
         # for friend in friends:
         #     friendship = Friendship(creator=user, friend=friend, state=1)
