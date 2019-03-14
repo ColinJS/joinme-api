@@ -67,6 +67,23 @@ def send_push_notification(user, message, body=None, title=None):
         send_push_message(user.profile.notification_key, message, body, title, badge)
 
 
+def get_facebook_friends(user):
+    response = requests.get('https://graph.facebook.com/me/friends', params=user.social_auth.get(provider="facebook").extra_data)
+
+    if response.status_code == 200:
+        friends = []
+        for friend in response.json()["data"]:
+            new_friends = User.objects.filter(social_auth__uid=friend['id']).first()
+            if new_friends:
+                friends.append(new_friends)
+
+        # for friend in friends:
+        #     friendship = Friendship(creator=user, friend=friend, state=1)
+        #     friendship.save()
+
+        return friends
+
+
 # TODO: Add try and catch and test ...
 class FirstConnection(APIView):
 
@@ -101,24 +118,6 @@ class FirstConnection(APIView):
                         # Create a new avatar object with the facebook url
                         avatar = Avatar(url=url, user=user)
                         avatar.save()
-
-                # Get the friends list and recreate friends relationships
-                # TODO: not allowed to have duplicate relationship like A->B and B->A, So check before to add one
-                response = requests.get(
-                    'https://graph.facebook.com/me/friends',
-                    params={'access_token': user.social_auth.get(provider="facebook").extra_data['access_token']}
-                )
-
-                if response.status_code == 200:
-                    friends = []
-                    for friend in response.json()["data"]:
-                        new_friends = User.objects.filter(social_auth__uid=friend['id']).first()
-                        if new_friends:
-                            friends.append(new_friends)
-
-                    for friend in friends:
-                        friendship = Friendship(creator=user, friend=friend, state=1)
-                        friendship.save()
 
                 profile = Profile(user=request.user, init=True)
                 profile.save()
@@ -169,11 +168,14 @@ class Users(APIView):
         if request.auth:
             me = request.user
             users = User.objects.all().order_by('last_name')
+            facebook_friends = get_facebook_friends(me)
             filtered = request.query_params.get('filter', '').replace('?', '')
             search = request.query_params.get('search', '').replace('?', '')
             if search != '':
                 queryset = users.annotate(fullname=Concat('first_name', Value(' '), 'last_name'))
                 users = queryset.filter(fullname__icontains=search)
+                ff_queryset = facebook_friends.annotate(fullname=Concat('first_name', Value(' '), 'last_name'))
+                facebook_friends = ff_queryset.filter(fullname__icontains=search)
 
             if filtered == 'no-friends':  # TODO: the ? is automatically added at the end of the url. Will have to debug that
                 from django.db.models import Q
