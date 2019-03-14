@@ -181,7 +181,7 @@ class Users(APIView):
                 from django.db.models import Q
                 users = users.filter(~Q(Q(friendship_creator__friend=me) | Q(friendship_friend__creator=me)))
 
-            ctx = {'users': [], 'alpha_sorted_user': {}}
+            ctx = {'users': [], 'alpha_sorted_user': {}, 'facebook_friends': facebook_friends}
             for user in users:
                 if user.username != "admin" and me != user:
                     new_user = {
