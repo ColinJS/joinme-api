@@ -79,7 +79,7 @@ def get_facebook_friends(user):
         #     friendship = Friendship(creator=user, friend=friend, state=1)
         #     friendship.save()
 
-        friends = User.objects.filter(social_auth_uid=ids_list)
+        friends = User.objects.filter(social_auth__uid=ids_list)
         return friends
 
 
