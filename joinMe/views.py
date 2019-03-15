@@ -180,7 +180,7 @@ class Users(APIView):
                 from django.db.models import Q
                 users = users.filter(~Q(Q(friendship_creator__friend=me) | Q(friendship_friend__creator=me)))
 
-            ctx = {'users': [], 'alpha_sorted_user': {}, 'facebook_friends': facebook_friends}
+            ctx = {'users': [], 'alpha_sorted_user': {}, 'facebook_friends': []}
             for user in users:
                 if user.username != "admin" and me != user:
                     new_user = {
@@ -195,6 +195,16 @@ class Users(APIView):
                         if user.first_name[0].lower() not in ctx['alpha_sorted_user']:
                             ctx['alpha_sorted_user'][user.first_name[0].lower()] = []
                         ctx['alpha_sorted_user'][user.first_name[0].lower()].append(new_user)
+            for user in facebook_friends:
+                if user.username != "admin" and me != user:
+                    new_user = {
+                        'id': user.pk,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'avatar': user.avatars.last().url if user.avatars and user.avatars.last() else '',
+                        'is_friend': True if user.friendship_creator.filter(friend=me, state=1).first() or user.friendship_friend.filter(creator=me, state=1).first() else False
+                    }
+                    ctx['facebook_friends'].append(new_user)
 
             return Response(ctx)
 
