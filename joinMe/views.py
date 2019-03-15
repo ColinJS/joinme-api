@@ -80,6 +80,8 @@ def get_facebook_friends(user):
         #     friendship.save()
 
         friends = User.objects.filter(social_auth__uid__in=ids_list)
+        from django.db.models import Q
+        friends = friends.filter(~Q(Q(friendship_creator__friend=user) | Q(friendship_friend__creator=user)))
         return friends
 
 
@@ -181,20 +183,23 @@ class Users(APIView):
                 users = users.filter(~Q(Q(friendship_creator__friend=me) | Q(friendship_friend__creator=me)))
 
             ctx = {'users': [], 'alpha_sorted_user': {}, 'facebook_friends': []}
-            for user in users:
-                if user.username != "admin" and me != user:
-                    new_user = {
-                        'id': user.pk,
-                        'first_name': user.first_name,
-                        'last_name': user.last_name,
-                        'avatar': user.avatars.last().url if user.avatars and user.avatars.last() else '',
-                        'is_friend': True if user.friendship_creator.filter(friend=me, state=1).first() or user.friendship_friend.filter(creator=me, state=1).first() else False
-                    }
-                    ctx['users'].append(new_user)
-                    if user.first_name[0]:
-                        if user.first_name[0].lower() not in ctx['alpha_sorted_user']:
-                            ctx['alpha_sorted_user'][user.first_name[0].lower()] = []
-                        ctx['alpha_sorted_user'][user.first_name[0].lower()].append(new_user)
+
+            if search != '':
+                for user in users:
+                    if user.username != "admin" and me != user:
+                        new_user = {
+                            'id': user.pk,
+                            'first_name': user.first_name,
+                            'last_name': user.last_name,
+                            'avatar': user.avatars.last().url if user.avatars and user.avatars.last() else '',
+                            'is_friend': True if user.friendship_creator.filter(friend=me, state=1).first() or user.friendship_friend.filter(creator=me, state=1).first() else False
+                        }
+                        ctx['users'].append(new_user)
+                        if user.first_name[0]:
+                            if user.first_name[0].lower() not in ctx['alpha_sorted_user']:
+                                ctx['alpha_sorted_user'][user.first_name[0].lower()] = []
+                            ctx['alpha_sorted_user'][user.first_name[0].lower()].append(new_user)
+
             for user in facebook_friends:
                 if user.username != "admin" and me != user:
                     new_user = {
