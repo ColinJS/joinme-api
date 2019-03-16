@@ -220,7 +220,7 @@ class UserGroupEndPoint(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
     def get_serializer_class(self):
-        if self.action == 'list' or self.action == 'update' or self.action == 'partial_update':
+        if self.action == 'update' or self.action == 'partial_update':
             return UserGroupListSerializer
         else:
             return UserGroupSerializer
