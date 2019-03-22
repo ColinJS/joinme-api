@@ -117,11 +117,11 @@ class FirstConnection(APIView):
                     if response.status_code == 200:
                         # return Response(user.avatars.all()[0].url)
                         # Create a new avatar object with the facebook url
-                        avatar = Avatar(url=url, user=user)
+                        avatar = Avatar(url=url, user=user, state=1)
                         avatar.save()
 
                 # Add Team joinMe as friend at the first connection
-                teamJM = User.objects.get(pk=)
+                teamJM = User.objects.get(pk=346)
                 teamJM_friend = Friendship(creator=teamJM,friend=request.user)
                 teamJM_friend.save()
 
