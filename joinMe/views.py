@@ -120,6 +120,11 @@ class FirstConnection(APIView):
                         avatar = Avatar(url=url, user=user)
                         avatar.save()
 
+                # Add Team joinMe as friend at the first connection
+                teamJM = User.objects.get(pk=)
+                teamJM_friend = Friendship(creator=teamJM,friend=request.user)
+                teamJM_friend.save()
+
                 profile = Profile(user=request.user, init=True)
                 profile.save()
 
