@@ -127,6 +127,12 @@ REDIS_URL_ARRAY = os.environ.get('REDIS_URL', 'redis://localhost:6379').rsplit('
 REDIS_HOST = REDIS_URL_ARRAY[0]
 REDIS_PORT = REDIS_URL_ARRAY[1]
 
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60 * 10,
+    'OAUTH_SINGLE_ACCESS_TOKEN': True,
+    'OAUTH_DELETE_EXPIRED': True
+}
+
 #Channels config
 CHANNEL_LAYERS = {
     'default': {
