@@ -128,6 +128,21 @@ class FirstConnection(APIView):
                 profile = Profile(user=request.user, init=True)
                 profile.save()
 
+                # Add in-app notif for ongoing public events
+                public_events = Event.objects.filter(ending_time__gte=now, is_public=True).distinct()
+                for e in public_events:
+                    channel_layer = get_channel_layer()
+                    user_group_name = 'user_%s' % user.id
+                    async_to_sync(channel_layer.group_send)(user_group_name, {
+                        "type": "notifs.change",
+                        "action": "add",
+                        "quantity": 1
+                    })
+                    notification = Notification(user=user, event=e,
+                                                type_of_notification=0)
+                    notification.save()
+
+
             ctx = {
                 'id': user.id,
                 'first_name': user.first_name,
@@ -365,6 +380,7 @@ class EventList(APIView):
                                         })
                                         notification = Notification(user=f_user, event=event,
                                                                     type_of_notification=0)
+                                        notification.save()
 
 
 
