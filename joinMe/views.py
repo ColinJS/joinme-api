@@ -316,22 +316,57 @@ class EventList(APIView):
 
                     place.save()
 
+                    # Manage Notification:
+                    # If it's a public event we send a in-app notif (not push notif) to every one and a push to people that are already invited
+                    # If it's not a public event we send a normal push notif+ in-app notif to guests
                     if 'friends' in data:
-                        for f in data['friends']:
-                            f_user = User.objects.filter(pk=f['id']).first()
-                            if f_user and f_user != user:
-                                send_push_notification(f_user,  "%s invited you to an event." % user.first_name, {'screen': 'event', 'event_id': event.pk})
-                                channel_layer = get_channel_layer()
-                                user_group_name = 'user_%s' % f_user.pk
-                                async_to_sync(channel_layer.group_send)(user_group_name, {
-                                    "type": "notifs.change",
-                                    "action": "add",
-                                    "quantity": 1
-                                })
-                                sharing = GuestToEvent(guest=f_user, event=event, state=0)
-                                sharing.save()
-                                notification = Notification(user=f_user, event=event, type_of_notification=0)
-                                notification.save()
+                        if not is_public:
+                            for f in data['friends']:
+                                f_user = User.objects.filter(pk=f['id']).first()
+                                if f_user and f_user != user:
+                                    send_push_notification(f_user,  "%s invited you to an event." % user.first_name, {'screen': 'event', 'event_id': event.pk})
+                                    channel_layer = get_channel_layer()
+                                    user_group_name = 'user_%s' % f_user.pk
+                                    async_to_sync(channel_layer.group_send)(user_group_name, {
+                                        "type": "notifs.change",
+                                        "action": "add",
+                                        "quantity": 1
+                                    })
+                                    sharing = GuestToEvent(guest=f_user, event=event, state=0)
+                                    sharing.save()
+                                    notification = Notification(user=f_user, event=event, type_of_notification=0)
+                                    notification.save()
+                        else:
+                            for f_user in User.objects.all():
+                                for f in data['friends']:
+                                    if f_user.pk == f['id'] and f_user != user:
+                                        send_push_notification(f_user,
+                                                               "%s invited you to an event." % user.first_name,
+                                                               {'screen': 'event', 'event_id': event.pk})
+                                        channel_layer = get_channel_layer()
+                                        user_group_name = 'user_%s' % f_user.pk
+                                        async_to_sync(channel_layer.group_send)(user_group_name, {
+                                            "type": "notifs.change",
+                                            "action": "add",
+                                            "quantity": 1
+                                        })
+                                        sharing = GuestToEvent(guest=f_user, event=event, state=0)
+                                        sharing.save()
+                                        notification = Notification(user=f_user, event=event,
+                                                                    type_of_notification=0)
+                                        notification.save()
+                                    elif f_user != user:
+                                        channel_layer = get_channel_layer()
+                                        user_group_name = 'user_%s' % f_user.pk
+                                        async_to_sync(channel_layer.group_send)(user_group_name, {
+                                            "type": "notifs.change",
+                                            "action": "add",
+                                            "quantity": 1
+                                        })
+                                        notification = Notification(user=f_user, event=event,
+                                                                    type_of_notification=0)
+
+
 
             ctx = {
                 'id': user.my_events.last().id,
