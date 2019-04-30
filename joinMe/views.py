@@ -129,6 +129,7 @@ class FirstConnection(APIView):
                 profile.save()
 
                 # Add in-app notif for ongoing public events
+                now = timezone.now()
                 public_events = Event.objects.filter(ending_time__gte=now, is_public=True).distinct()
                 for e in public_events:
                     channel_layer = get_channel_layer()
