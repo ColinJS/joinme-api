@@ -605,6 +605,7 @@ class EventDetails(APIView):
                     'type': notif.type_of_notification
                 } for notif in notifications],
                 'guests': [],
+                'is_public': event.is_public
             }
 
             notifications.delete()
