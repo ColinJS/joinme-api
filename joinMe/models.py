@@ -56,7 +56,7 @@ class GuestToEvent(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     guest = models.ForeignKey(User, related_name='events', blank=True, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, related_name='guests', blank=True, on_delete=models.CASCADE)
-    state = models.SmallIntegerField(choices=((0, "PENDING"), (1, "ACCEPTED"), (2, "REFUSED")), default=0)
+    state = models.SmallIntegerField(choices=((0, "PENDING"), (3, "SEEN"), (1, "ACCEPTED"), (2, "REFUSED")), default=0)
 
 
 class Place(models.Model):
