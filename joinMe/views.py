@@ -886,7 +886,7 @@ class SharingEvent(APIView):
 
                         notification = Notification(user=f_user, event=event, type_of_notification=0)
                         notification.save()
-                        send_push_notification(f_user.profile.notification_key, "%s invited you to %s'event." % (user.first_name, event.created_by.first_name))
+                        send_push_notification(f_user, "%s invited you to %s'event." % (user.first_name, event.created_by.first_name))
 
             ctx = {'response': []}
             guests = [gte.guest for gte in GuestToEvent.objects.filter(event__pk=event.pk)]
