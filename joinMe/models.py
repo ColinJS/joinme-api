@@ -22,47 +22,18 @@ class Avatar(models.Model):
     url = models.URLField()
     user = models.ForeignKey(User, related_name='avatars', on_delete=models.CASCADE)
 
-
-class Event(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='my_events', on_delete=models.DO_NOTHING, blank=True)
-    duration = models.DurationField(blank=True, default=datetime.timedelta(hours=3))
-    ending_time = models.DateTimeField(default=timezone.now()+datetime.timedelta(hours=3))
-    is_public = models.BooleanField(default=False)
-
-    @property
-    def last_place(self):
-        last_place = self.place.last() if self.place and self.place.last() else None
-        return last_place
-
-    def __str__(self):
-        return "%s %s" % (self.created_by.first_name, self.created_by.last_name)
-
-
+# TODO: Ajouter User dans les fonctions, Changer la création d'une vidéo et d'un event
 class Video(models.Model):
     created = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, related_name='my_events', on_delete=models.DO_NOTHING, blank=True)
     video = models.URLField(blank=False, null=False, default='https://join-me.s3.amazonaws.com/input/video_.mov')
-    event = models.ForeignKey(Event, related_name='videos', on_delete=models.CASCADE, blank=True, null=True)
+    # event = models.ForeignKey(Event, related_name='videos', on_delete=models.CASCADE, blank=True, null=True)
 
-
-class Friendship(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    creator = models.ForeignKey(User, related_name='friendship_creator', on_delete=models.CASCADE, blank=False)
-    friend = models.ForeignKey(User, related_name='friendship_friend', on_delete=models.CASCADE, blank=False)
-    state = models.SmallIntegerField(choices=((0, "PENDING"), (1, "ACCEPTED"), (2, "BLOCKED")), default=0)
-
-
-class GuestToEvent(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    guest = models.ForeignKey(User, related_name='events', blank=True, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, related_name='guests', blank=True, on_delete=models.CASCADE)
-    state = models.SmallIntegerField(choices=((0, "PENDING"), (3, "SEEN"), (1, "ACCEPTED"), (2, "REFUSED")), default=0)
-
-
+# TODO: Changer la création de la place et de l'event en fonction
 class Place(models.Model):
     formatted_address = models.CharField(max_length=200, blank=False)
     place_id = models.CharField(max_length=200, blank=False)
-    event = models.ForeignKey(Event, related_name='place', on_delete=models.CASCADE)
+    # event = models.ForeignKey(Event, related_name='place', on_delete=models.CASCADE)
     location = gis_models.PointField(u"longitude/lattitude", geography=True, blank=True, null=True)
 
     objects = models.Manager()
@@ -87,6 +58,38 @@ class Place(models.Model):
                     self.location = geos.fromstr(point)
 
         super(Place, self).save()
+
+
+class Event(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, related_name='my_events', on_delete=models.DO_NOTHING, blank=True)
+    duration = models.DurationField(blank=True, default=datetime.timedelta(hours=3))
+    ending_time = models.DateTimeField(default=timezone.now()+datetime.timedelta(hours=3))
+    is_public = models.BooleanField(default=False)
+    videos = models.ManyToManyField(Video, related_name='event')
+    place = models.ManyToManyField(Place, related_name='event')
+
+    @property
+    def last_place(self):
+        last_place = self.place.last() if self.place and self.place.last() else None
+        return last_place
+
+    def __str__(self):
+        return "%s %s" % (self.created_by.first_name, self.created_by.last_name)
+
+
+class Friendship(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    creator = models.ForeignKey(User, related_name='friendship_creator', on_delete=models.CASCADE, blank=False)
+    friend = models.ForeignKey(User, related_name='friendship_friend', on_delete=models.CASCADE, blank=False)
+    state = models.SmallIntegerField(choices=((0, "PENDING"), (1, "ACCEPTED"), (2, "BLOCKED")), default=0)
+
+
+class GuestToEvent(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    guest = models.ForeignKey(User, related_name='events', blank=True, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, related_name='guests', blank=True, on_delete=models.CASCADE)
+    state = models.SmallIntegerField(choices=((0, "PENDING"), (3, "SEEN"), (1, "ACCEPTED"), (2, "REFUSED")), default=0)
 
 
 class Notification(models.Model):

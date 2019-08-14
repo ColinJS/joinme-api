@@ -310,7 +310,7 @@ class EventList(APIView):
                 with transaction.atomic():
                     url = data['video'].replace('/input/', '/output/').rsplit('.', 1)[0]+".mp4"
 
-                    video = Video(video=url)
+                    video = Video(video=url, created_by=user)
                     video.save()
 
                     is_public = True if 'public' in data and data['public'] else False
@@ -321,7 +321,7 @@ class EventList(APIView):
                     event.save()
 
                     place = Place(formatted_address=placeData.get('formatted_address', ''),
-                                  place_id=placeData.get('place_id', ''), event=event)
+                                  place_id=placeData.get('place_id', ''))
 
                     longitude = placeData.get('longitude', '')
                     latitude = placeData.get('latitude', '')
@@ -331,6 +331,9 @@ class EventList(APIView):
                         place.location = location
 
                     place.save()
+
+                    event.places.set([place])
+                    event.save()
 
                     # Manage Notification:
                     # If it's a public event we send a in-app notif (not push notif) to every one and a push to people that are already invited
@@ -751,7 +754,7 @@ class VideoEvent(APIView):
                 with transaction.atomic():
                     url = data['video'].replace('/input/', '/output/').rsplit('.', 1)[0]+".mp4"
 
-                    video = Video(video=url, event=event)
+                    video = Video(video=url, created_by=user, event=event)
                     video.save()
 
                 from django.db.models import Q
