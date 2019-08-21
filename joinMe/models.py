@@ -25,7 +25,7 @@ class Avatar(models.Model):
 # TODO: Ajouter User dans les fonctions, Changer la création d'une vidéo et d'un event
 class Video(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, related_name='my_events', on_delete=models.DO_NOTHING, blank=True)
+    created_by = models.ForeignKey(User, related_name='my_videos', on_delete=models.DO_NOTHING, blank=True, null=True)
     video = models.URLField(blank=False, null=False, default='https://join-me.s3.amazonaws.com/input/video_.mov')
     # event = models.ForeignKey(Event, related_name='videos', on_delete=models.CASCADE, blank=True, null=True)
 
