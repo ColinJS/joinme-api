@@ -332,7 +332,7 @@ class EventList(APIView):
 
                     place.save()
 
-                    event.places.set([place])
+                    event.place.set([place])
                     event.save()
 
                     # Manage Notification:
