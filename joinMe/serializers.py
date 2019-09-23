@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from joinMe.models import Friendship, Profile, Avatar, Event, Video, UserGroup, Comment
+from joinMe.models import Friendship, Profile, Avatar, Event, Video, UserGroup, Comment, Venue, Mood, Place
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth import get_user_model
 
@@ -110,3 +110,26 @@ class FriendshipSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'created', 'creator', 'friend', 'state')
+
+
+class MoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: Mood
+        fields = ('id', 'title', 'description')
+
+
+class PlaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Place
+        fields = ('id', 'formatted_address', 'place_id')
+
+
+class VenueSerializer(serializers.ModelSerializer):
+
+    owner = SimpleUserSerializer(read_only=True)
+    followers = SimpleUserSerializer(read_only=True, many=True)
+    mood = MoodSerializer(read_only=True)
+
+    class Meta:
+        model = Venue
+        fields = ('id', 'owner', 'followers', 'mood', 'place', 'discount')

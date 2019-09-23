@@ -638,7 +638,6 @@ class EventDetails(APIView):
         return Response({'message': 'Authentication denied'})
 
 
-
     def put(self, request, event_id):
         if request.auth:
             user = request.user
