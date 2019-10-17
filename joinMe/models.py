@@ -6,6 +6,8 @@ from geopy.exc import GeocoderQueryError
 
 from urllib.error import URLError
 
+import os
+
 from django.contrib.auth.models import User
 import datetime
 from django.utils import timezone
@@ -53,7 +55,7 @@ class Place(models.Model):
         if not self.location:
             address = u'%s' % self.formatted_address
             address = address.encode('utf-8')
-            geocoder = GoogleV3('AIzaSyA8QQ8ADBfhHcnRn-UZFF_8lC7yGm1JLD0',)
+            geocoder = GoogleV3(os.environ.get('GOOGLE_KEY', ''),)
             try:
                 location_response = geocoder.geocode(address)
             except (URLError, GeocoderQueryError, ValueError):

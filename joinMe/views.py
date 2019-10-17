@@ -11,7 +11,7 @@ from django.db.models.functions import Concat
 from django.db.models import Value
 from django.contrib.gis import geos
 
-import requests, os, boto3, random, string, time
+import requests, os, boto3, random, string, time, stripe
 
 from exponent_server_sdk import DeviceNotRegisteredError
 from exponent_server_sdk import PushClient
@@ -568,7 +568,8 @@ class EventDetailsForWeb(APIView):
             'ending_date': event.ending_time,
         }
 
-        return render(request, 'events.html', ctx)
+        return Response(ctx)
+        # return render(request, 'events.html', ctx)
 
 
 class EventDetails(APIView):
@@ -940,6 +941,32 @@ class Notifications(APIView):
                 notification.save()
 
             return Response({'response': "done"})
+
+
+# class PremiumAccount(APIView):
+#
+#     def post(self, request):
+#         if request.auth:
+#             user = request.user
+#             card_id = request.data["card_token"]
+#
+#             stripe.api_key(os.environ.get('STRIPE_KEY', ''))
+#
+#             customer = stripe.Customer.create(
+#                 email=user.email,
+#                 source=card_id  # obtained with Stripe.js
+#             )
+#
+#             stripe.Subscription.create(
+#                 customer=customer.id,
+#                 items=[
+#                     {
+#                       "plan": "plan_Fuvvz0UlwmE6DS",
+#                     },
+#                 ]
+#             )
+
+
 
 class aws_s3_interface(APIView):
 
